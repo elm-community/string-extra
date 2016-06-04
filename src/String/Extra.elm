@@ -1,4 +1,4 @@
-module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, break, softBreak, clean)
+module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean)
 
 {-| Additional functions for working with Strings
 
@@ -8,7 +8,7 @@ module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice
 
 ## Replacing
 
-@docs replace, replaceSlice, clean
+@docs replace, replaceSlice, insertAt, clean
 
 ## Splitting
 
@@ -75,6 +75,15 @@ string, a start index and an end index.
 replaceSlice : String -> Int -> Int -> String -> String
 replaceSlice substitution start end string =
     (String.slice 0 start string) ++ substitution ++ (String.slice end (String.length string) string)
+
+
+{-| Inserts a substring at the specified index.
+
+    insertAt "world" 6 "Hello " === "Hello world"
+-}
+insertAt : String -> Int -> String -> String
+insertAt insert pos string =
+    replaceSlice insert pos pos string
 
 
 {-| Breaks a string into a list of strings of maximum the provided size.

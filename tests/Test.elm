@@ -3,7 +3,7 @@ module Test exposing (..)
 import String.Extra exposing (..)
 import String exposing (uncons, fromChar, toUpper)
 import Check exposing (Claim, Evidence, suite, claim, that, is, for, true, false, quickCheck)
-import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple4)
+import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4)
 import Check.Test
 import Check.Producer exposing (Producer)
 import ElmTest
@@ -181,6 +181,57 @@ cleanClaims =
         ]
 
 
+insertAtClaims : Claim
+insertAtClaims =
+    suite "insertAt"
+        [ claim "Result contains the substitution string"
+            `true` (\( sub, at, string ) ->
+                        string
+                            |> insertAt sub at
+                            |> String.contains sub
+                   )
+            `for` insertAtProducer
+        , claim "Resulting string has length as the sum of both arguments"
+            `that` (\( sub, at, string ) ->
+                        (String.length sub) + (String.length string)
+                   )
+            `is` (\( sub, at, string ) ->
+                    insertAt sub at string
+                        |> String.length
+                 )
+            `for` insertAtProducer
+        , claim "Start of the string remains the same"
+            `that` (\( sub, at, string ) ->
+                        String.slice 0 at string
+                   )
+            `is` (\( sub, at, string ) ->
+                    insertAt sub at string
+                        |> String.slice 0 at
+                 )
+            `for` insertAtProducer
+        , claim "End of the string remains the same"
+            `that` (\( sub, at, string ) ->
+                        String.slice at (String.length string) string
+                   )
+            `is` (\( sub, at, string ) ->
+                    insertAt sub at string
+                        |> String.slice (at + (String.length sub))
+                            ((String.length string) + String.length sub)
+                 )
+            `for` insertAtProducer
+        ]
+
+
+insertAtProducer : Producer ( String, Int, String )
+insertAtProducer =
+    filter
+        (\( sub, at, string ) ->
+            (String.length string >= at)
+                && (not <| String.isEmpty sub)
+        )
+        (tuple3 ( string, (rangeInt 0 10), string ))
+
+
 evidence : Evidence
 evidence =
     suite "String.Addons"
@@ -191,6 +242,7 @@ evidence =
         , breakClaims
         , softBreakClaims
         , cleanClaims
+        , insertAtClaims
         ]
         |> quickCheck
 
