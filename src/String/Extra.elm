@@ -1,4 +1,4 @@
-module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, break, softBreak)
+module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, break, softBreak, clean)
 
 {-| Additional functions for working with Strings
 
@@ -8,7 +8,7 @@ module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice
 
 ## Replacing
 
-@docs replace, replaceSlice
+@docs replace, replaceSlice, clean
 
 ## Splitting
 
@@ -43,16 +43,14 @@ toSentenceCase word =
 -}
 toTitleCase : String -> String
 toTitleCase ws =
-    ws
-        |> Regex.replace All
-            (regex "^([a-z])|\\s+([a-z])")
-            (\{ match } -> uppercaseMatch match)
-
-
-uppercaseMatch : String -> String
-uppercaseMatch match =
-    match
-        |> Regex.replace All (regex "\\w+") (.match >> toSentenceCase)
+    let
+        uppercaseMatch =
+            Regex.replace All (regex "\\w+") (.match >> toSentenceCase)
+    in
+        ws
+            |> Regex.replace All
+                (regex "^([a-z])|\\s+([a-z])")
+                (\{ match } -> uppercaseMatch match)
 
 
 {-| Replace all occurrences of the search string with the substitution string.
@@ -119,3 +117,16 @@ softBreak width string =
         string
             |> Regex.find All (regex <| ".{1," ++ (toString width) ++ "}(\\s|$)|\\S+?(\\s|$)")
             |> List.map (.match)
+
+
+{-| Trims the whitespace of both sides of the string and compresses
+reapeated whitespace internally to a single whitespace char.
+
+    clean " The   quick brown   fox    " == "The quick brown fox"
+
+-}
+clean : String -> String
+clean string =
+    string
+        |> Regex.replace All (regex "\\s\\s+") (always " ")
+        |> String.trim

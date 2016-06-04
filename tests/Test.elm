@@ -165,6 +165,22 @@ softBreakClaims =
         ]
 
 
+cleanClaims : Claim
+cleanClaims =
+    suite "clean"
+        [ claim "The String.split result is the same as String.words"
+            `that` (clean >> String.split " ")
+            `is` (String.words)
+            `for` string
+        , claim "It trims the string on the left side"
+            `true` (not << String.startsWith " " << clean)
+            `for` string
+        , claim "It trims the string on the right side"
+            `true` (not << String.endsWith " " << clean)
+            `for` string
+        ]
+
+
 evidence : Evidence
 evidence =
     suite "String.Addons"
@@ -174,6 +190,7 @@ evidence =
         , replaceSliceClaims
         , breakClaims
         , softBreakClaims
+        , cleanClaims
         ]
         |> quickCheck
 
