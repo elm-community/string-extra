@@ -1,4 +1,17 @@
-module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean, isBlank, camelize, classify)
+module String.Extra
+    exposing
+        ( toSentenceCase
+        , toTitleCase
+        , replace
+        , replaceSlice
+        , insertAt
+        , break
+        , softBreak
+        , clean
+        , isBlank
+        , camelize
+        , classify
+        )
 
 {-| Additional functions for working with Strings
 
