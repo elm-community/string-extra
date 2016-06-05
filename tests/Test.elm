@@ -244,6 +244,16 @@ isBlankClaims =
         ]
 
 
+classifyClaims : Claim
+classifyClaims =
+    suite "classify"
+        [ claim "Is is the sentence case version of camelize"
+            `that` (classify)
+            `is` (camelize >> toSentenceCase)
+            `for` string
+        ]
+
+
 evidence : Evidence
 evidence =
     suite "String.Extra"
@@ -257,6 +267,7 @@ evidence =
         , insertAtClaims
         , isBlankClaims
         , camelizeClaims
+        , classifyClaims
         ]
         |> quickCheck
 

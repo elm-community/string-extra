@@ -1,10 +1,10 @@
-module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean, isBlank, camelize)
+module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean, isBlank, camelize, classify)
 
 {-| Additional functions for working with Strings
 
 ## Change words casing
 
-@docs toSentenceCase, toTitleCase, camelize
+@docs toSentenceCase, toTitleCase, camelize, classify
 
 ## Replace and Splice
 
@@ -176,3 +176,13 @@ camelize string =
                     ""
         )
         (String.trim string)
+
+
+{-| Converts string to camelized string starting with an uppercase
+
+   classify "some_class_name" === "SomeClassName"
+
+-}
+classify : String -> String
+classify =
+    camelize >> toSentenceCase
