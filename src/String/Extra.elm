@@ -1,10 +1,10 @@
-module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean, isBlank)
+module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean, isBlank, camelize)
 
 {-| Additional functions for working with Strings
 
 ## Change words casing
 
-@docs toSentenceCase, toTitleCase
+@docs toSentenceCase, toTitleCase, camelize
 
 ## Replace and Splice
 
@@ -156,3 +156,23 @@ clean string =
 isBlank : String -> Bool
 isBlank string =
     Regex.contains (regex "^\\s*$") string
+
+
+{-| Converts underscored or dasherized string to a camelized one.
+
+   camelize "-moz-transform" === "MozTransform"
+
+-}
+camelize : String -> String
+camelize string =
+    Regex.replace All
+        (regex "[-_\\s]+(.)?")
+        (\{ submatches } ->
+            case submatches of
+                (Just match) :: _ ->
+                    String.toUpper match
+
+                _ ->
+                    ""
+        )
+        (String.trim string)

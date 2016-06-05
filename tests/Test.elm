@@ -8,6 +8,7 @@ import Check.Test
 import Check.Producer exposing (Producer)
 import Regex
 import ElmTest
+import CamelizeTest exposing (camelizeClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -245,7 +246,7 @@ isBlankClaims =
 
 evidence : Evidence
 evidence =
-    suite "String.Addons"
+    suite "String.Extra"
         [ toSentenceCaseClaims
         , toTitleCaseClaims
         , replaceClaims
@@ -255,6 +256,7 @@ evidence =
         , cleanClaims
         , insertAtClaims
         , isBlankClaims
+        , camelizeClaims
         ]
         |> quickCheck
 
