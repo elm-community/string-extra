@@ -6,6 +6,7 @@ import Check exposing (Claim, Evidence, suite, claim, that, is, for, true, false
 import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4)
 import Check.Test
 import Check.Producer exposing (Producer)
+import Regex
 import ElmTest
 
 
@@ -232,6 +233,16 @@ insertAtProducer =
         (tuple3 ( string, (rangeInt 0 10), string ))
 
 
+isBlankClaims : Claim
+isBlankClaims =
+    suite "isBlank"
+        [ claim "Returns false if there are non whitespace characters"
+            `that` (isBlank)
+            `is` (Regex.contains (Regex.regex "^\\s*$"))
+            `for` string
+        ]
+
+
 evidence : Evidence
 evidence =
     suite "String.Addons"
@@ -243,6 +254,7 @@ evidence =
         , softBreakClaims
         , cleanClaims
         , insertAtClaims
+        , isBlankClaims
         ]
         |> quickCheck
 

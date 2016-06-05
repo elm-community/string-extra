@@ -1,18 +1,22 @@
-module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean)
+module String.Extra exposing (toSentenceCase, toTitleCase, replace, replaceSlice, insertAt, break, softBreak, clean, isBlank)
 
 {-| Additional functions for working with Strings
 
-## Modifying
+## Change words casing
 
 @docs toSentenceCase, toTitleCase
 
-## Replacing
+## Replace and Splice
 
 @docs replace, replaceSlice, insertAt, clean
 
 ## Splitting
 
 @docs break, softBreak
+
+## Checks
+
+@docs isBlank
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -139,3 +143,16 @@ clean string =
     string
         |> Regex.replace All (regex "\\s\\s+") (always " ")
         |> String.trim
+
+
+{-| Tests if a string is empty or only contains whitespace
+
+   isBlank "" === True
+   isBlank "\n" === True
+   isBlank "  " === True
+   isBlank " a" === False
+
+-}
+isBlank : String -> Bool
+isBlank string =
+    Regex.contains (regex "^\\s*$") string
