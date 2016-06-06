@@ -247,10 +247,17 @@ isBlankClaims =
 classifyClaims : Claim
 classifyClaims =
     suite "classify"
-        [ claim "Is is the sentence case version of camelize"
-            `that` (classify)
-            `is` (camelize >> toSentenceCase)
+        [ claim "It does not contain non-word characters"
+            `false` (classify >> Regex.contains (Regex.regex "[\\W]"))
             `for` string
+        , claim "It starts with an uppercase letter"
+            `that` (classify >> uncons >> Maybe.map fst)
+            `is` (String.trim >> String.toUpper >> uncons >> Maybe.map fst)
+            `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
+        , claim "It it camelized"
+            `that` (classify >> uncons >> Maybe.map snd)
+            `is` (camelize >> uncons >> Maybe.map snd)
+            `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
         ]
 
 

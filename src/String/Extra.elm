@@ -191,11 +191,17 @@ camelize string =
         (String.trim string)
 
 
-{-| Converts string to camelized string starting with an uppercase
+{-| Converts string to camelized string starting with an uppercase.
+All non word characters will be stripped out of the original string.
 
    classify "some_class_name" === "SomeClassName"
+   classify "myLittleCamel.class.name" === "MyLittleCamelClassName"
 
 -}
 classify : String -> String
-classify =
-    camelize >> toSentenceCase
+classify string =
+    string
+        |> Regex.replace All (regex "[\\W_]") (always " ")
+        |> camelize
+        |> replace " " ""
+        |> toSentenceCase
