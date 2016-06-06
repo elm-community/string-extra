@@ -254,10 +254,10 @@ classifyClaims =
             `that` (classify >> uncons >> Maybe.map fst)
             `is` (String.trim >> String.toUpper >> uncons >> Maybe.map fst)
             `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
-        , claim "It it camelized"
+        , claim "It is camelized once replaced non word charactes with a compatible string"
             `that` (classify >> uncons >> Maybe.map snd)
-            `is` (camelize >> uncons >> Maybe.map snd)
-            `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
+            `is` (replace "." "-" >> camelize >> uncons >> Maybe.map snd)
+            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z\\s\\.\\-\\_]+$")) string
         ]
 
 
