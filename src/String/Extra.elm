@@ -67,7 +67,7 @@ toTitleCase ws =
         ws
             |> Regex.replace All
                 (regex "^([a-z])|\\s+([a-z])")
-                (\{ match } -> uppercaseMatch match)
+                (.match >> uppercaseMatch)
 
 
 {-| Replace all occurrences of the search string with the substitution string.

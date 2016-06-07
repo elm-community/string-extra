@@ -15,12 +15,12 @@ toSentenceCaseClaims : Claim
 toSentenceCaseClaims =
     suite "toSentenceCase"
         [ claim "It only converts to uppercase the first char in the string"
-            `that` (\string -> uncons (toSentenceCase string) |> Maybe.map fst |> Maybe.map fromChar |> Maybe.withDefault "")
-            `is` (\string -> uncons string |> Maybe.map fst |> Maybe.map fromChar |> Maybe.map toUpper |> Maybe.withDefault "")
+            `that` (toSentenceCase >> uncons >> Maybe.map (fst >> fromChar) >> Maybe.withDefault "")
+            `is` (uncons >> Maybe.map (fst >> fromChar >> toUpper) >> Maybe.withDefault "")
             `for` string
         , claim "The tail of the stirng remains untouched"
-            `that` (\string -> uncons (toSentenceCase string) |> Maybe.map snd |> Maybe.withDefault "")
-            `is` (\string -> uncons string |> Maybe.map snd |> Maybe.withDefault "")
+            `that` (toSentenceCase >> uncons >> Maybe.map snd >> Maybe.withDefault "")
+            `is` (uncons >> Maybe.map snd >> Maybe.withDefault "")
             `for` string
         ]
 
@@ -29,12 +29,12 @@ toTitleCaseClaims : Claim
 toTitleCaseClaims =
     suite "toTitleCase"
         [ claim "It converts the first letter of each word to uppercase"
-            `that` (\arg -> arg |> String.join " " |> toTitleCase |> String.words)
-            `is` (\arg -> arg |> String.join " " |> String.words |> List.map toSentenceCase)
+            `that` (String.join " " >> toTitleCase >> String.words)
+            `is` (String.join " " >> String.words >> List.map toSentenceCase)
             `for` list string
         , claim "It does not change the length of the string"
-            `that` (\arg -> arg |> String.join " " |> toTitleCase |> String.length)
-            `is` (\arg -> arg |> String.join " " |> String.length)
+            `that` (String.join " " >> toTitleCase >> String.length)
+            `is` (String.join " " >> String.length)
             `for` list string
         ]
 
