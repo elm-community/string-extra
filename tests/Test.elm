@@ -1,7 +1,7 @@
 module Test exposing (..)
 
 import String.Extra exposing (..)
-import String exposing (uncons, fromChar, toUpper)
+import String exposing (uncons, fromChar, toUpper, toLower)
 import Check exposing (Claim, Evidence, suite, claim, that, is, for, true, false, quickCheck)
 import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4)
 import Check.Test
@@ -18,7 +18,21 @@ toSentenceCaseClaims =
             `that` (toSentenceCase >> uncons >> Maybe.map (fst >> fromChar) >> Maybe.withDefault "")
             `is` (uncons >> Maybe.map (fst >> fromChar >> toUpper) >> Maybe.withDefault "")
             `for` string
-        , claim "The tail of the stirng remains untouched"
+        , claim "The tail of the string remains untouched"
+            `that` (toSentenceCase >> uncons >> Maybe.map snd >> Maybe.withDefault "")
+            `is` (uncons >> Maybe.map snd >> Maybe.withDefault "")
+            `for` string
+        ]
+
+
+decapitalizeClaims : Claim
+decapitalizeClaims =
+    suite "decapitalize"
+        [ claim "It only converts to lowercase the first char in the string"
+            `that` (toSentenceCase >> uncons >> Maybe.map (fst >> fromChar) >> Maybe.withDefault "")
+            `is` (uncons >> Maybe.map (fst >> fromChar >> toLower) >> Maybe.withDefault "")
+            `for` string
+        , claim "The tail of the string remains untouched"
             `that` (toSentenceCase >> uncons >> Maybe.map snd >> Maybe.withDefault "")
             `is` (uncons >> Maybe.map snd >> Maybe.withDefault "")
             `for` string

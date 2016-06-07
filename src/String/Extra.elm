@@ -2,6 +2,7 @@ module String.Extra
     exposing
         ( toSentenceCase
         , toTitleCase
+        , decapitalize
         , replace
         , replaceSlice
         , insertAt
@@ -17,7 +18,7 @@ module String.Extra
 
 ## Change words casing
 
-@docs toSentenceCase, toTitleCase, camelize, classify
+@docs toSentenceCase, toTitleCase, decapitalize, camelize, classify
 
 ## Replace and Splice
 
@@ -33,11 +34,35 @@ module String.Extra
 -}
 
 import String exposing (uncons, cons, words, join)
-import Char exposing (toUpper)
+import Char exposing (toUpper, toLower)
 import Regex exposing (regex, escape, HowMany(..))
 import Maybe exposing (Maybe(..))
 import List
 
+
+type Case
+    = Upper
+    | Lower
+
+
+{-| Changes the case of the first letter of a string to either Uppercase of
+    lowercase, depending of the value of `wantedCase`. This is an internal
+    function for use in `toSencenceCase` and `decapitalize`.
+
+-}
+changeCase : Case -> String -> String
+changeCase wantedCase word =
+    uncons word
+        |> Maybe.map (\( head, tail ) ->
+            (case wantedCase of
+                Upper ->
+                    cons (toUpper head) tail
+
+                Lower ->
+                    cons (toLower head) tail
+            ))
+
+        |> Maybe.withDefault ""
 
 {-| Make a string's first character uppercase
 
@@ -47,9 +72,17 @@ import List
 -}
 toSentenceCase : String -> String
 toSentenceCase word =
-    uncons word
-        |> Maybe.map (\( head, tail ) -> cons (toUpper head) tail)
-        |> Maybe.withDefault ""
+    changeCase Upper word
+
+{-| Make a string's first character lowercase.
+
+    decapitalize "This is a phrase" == "this is a phrase"
+    decapitalize "Hello, World" == "hello, World"
+
+-}
+decapitalize : String -> String
+decapitalize word =
+    changeCase Lower word
 
 
 {-| Uppercase the first character of each word in a string
