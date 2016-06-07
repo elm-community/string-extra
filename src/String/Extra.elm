@@ -41,7 +41,7 @@ import List
 
 {-| Make a string's first character uppercase
 
-    toSentenceCase "this is a phrase" == "This is a phare"
+    toSentenceCase "this is a phrase" == "This is a phrase"
     toSentenceCase "hello, world" == "Hello, world"
 
 -}
