@@ -45,28 +45,15 @@ import Maybe exposing (Maybe(..))
 import List
 
 
-type Case
-    = Upper
-    | Lower
-
-
 {-| Changes the case of the first letter of a string to either Uppercase of
     lowercase, depending of the value of `wantedCase`. This is an internal
     function for use in `toSencenceCase` and `decapitalize`.
 
 -}
-changeCase : Case -> String -> String
-changeCase wantedCase word =
+changeCase : (Char -> Char) -> String -> String
+changeCase mutator word =
     uncons word
-        |> Maybe.map (\( head, tail ) ->
-            (case wantedCase of
-                Upper ->
-                    cons (toUpper head) tail
-
-                Lower ->
-                    cons (toLower head) tail
-            ))
-
+        |> Maybe.map (\( head, tail ) -> (cons (mutator head) tail))
         |> Maybe.withDefault ""
 
 {-| Make a string's first character uppercase
@@ -77,7 +64,7 @@ changeCase wantedCase word =
 -}
 toSentenceCase : String -> String
 toSentenceCase word =
-    changeCase Upper word
+    changeCase (toUpper) word
 
 {-| Make a string's first character lowercase.
 
@@ -87,7 +74,7 @@ toSentenceCase word =
 -}
 decapitalize : String -> String
 decapitalize word =
-    changeCase Lower word
+    changeCase (toLower) word
 
 
 {-| Uppercase the first character of each word in a string
