@@ -12,6 +12,7 @@ module String.Extra
         , isBlank
         , camelize
         , classify
+        , quote
         , surround
         , underscored
         )
@@ -36,7 +37,7 @@ module String.Extra
 
 ## Miscellaneous
 
-@docs surround
+@docs surround, quote
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -243,6 +244,16 @@ classify string =
 surround : String -> String -> String
 surround string wrap =
     wrap ++ string ++ wrap
+
+
+{-| surrounds a string with another string.
+
+   quote "foo" === "\"barfoobar\""
+
+-}
+quote : String -> String
+quote string =
+    surround string "\""
 
 
 {-| Returns a string joined by underscores after separating it by its uppercase characters.
