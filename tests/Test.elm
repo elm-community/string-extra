@@ -29,11 +29,11 @@ decapitalizeClaims : Claim
 decapitalizeClaims =
     suite "decapitalize"
         [ claim "It only converts to lowercase the first char in the string"
-            `that` (toSentenceCase >> uncons >> Maybe.map (fst >> fromChar) >> Maybe.withDefault "")
+            `that` (decapitalize >> uncons >> Maybe.map (fst >> fromChar) >> Maybe.withDefault "")
             `is` (uncons >> Maybe.map (fst >> fromChar >> toLower) >> Maybe.withDefault "")
             `for` string
         , claim "The tail of the string remains untouched"
-            `that` (toSentenceCase >> uncons >> Maybe.map snd >> Maybe.withDefault "")
+            `that` (decapitalize >> uncons >> Maybe.map snd >> Maybe.withDefault "")
             `is` (uncons >> Maybe.map snd >> Maybe.withDefault "")
             `for` string
         ]
@@ -121,7 +121,7 @@ replaceSliceProducer =
 
 breakClaims : Claim
 breakClaims =
-    suite "breakClaims"
+    suite "break"
         [ claim "The list should have as many elements as the ceil division of the length"
             `that` (\( string, width ) -> break width string |> List.length)
             `is` (\( string, width ) ->
@@ -280,6 +280,7 @@ evidence =
     suite "String.Extra"
         [ toSentenceCaseClaims
         , toTitleCaseClaims
+        , decapitalizeClaims
         , replaceClaims
         , replaceSliceClaims
         , breakClaims
