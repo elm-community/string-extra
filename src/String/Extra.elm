@@ -13,13 +13,14 @@ module String.Extra
         , camelize
         , classify
         , surround
+        , underscored
         )
 
 {-| Additional functions for working with Strings
 
 ## Change words casing
 
-@docs toSentenceCase, toTitleCase, decapitalize, camelize, classify
+@docs toSentenceCase, toTitleCase, decapitalize, camelize, classify, underscored
 
 ## Replace and Splice
 
@@ -56,6 +57,7 @@ changeCase mutator word =
         |> Maybe.map (\( head, tail ) -> (cons (mutator head) tail))
         |> Maybe.withDefault ""
 
+
 {-| Make a string's first character uppercase
 
     toSentenceCase "this is a phrase" == "This is a phrase"
@@ -65,6 +67,7 @@ changeCase mutator word =
 toSentenceCase : String -> String
 toSentenceCase word =
     changeCase (toUpper) word
+
 
 {-| Make a string's first character lowercase.
 
@@ -240,3 +243,20 @@ classify string =
 surround : String -> String -> String
 surround string wrap =
     wrap ++ string ++ wrap
+
+
+{-| Returns a string joined by underscores after separating it by its uppercase characters.
+Any sequence of spaces or dashes will also be converted to a single underscore
+
+   underscore "SomeClassName" === "some_class_name"
+   underscore "some-class-name" = "some_class_name"
+   underscore "SomeClass name" = "some_class_name
+
+-}
+underscored : String -> String
+underscored string =
+    string
+        |> String.trim
+        |> Regex.replace All (regex "([a-z\\d])([A-Z]+)") (.submatches >> List.map (Maybe.withDefault "") >> String.join "_")
+        |> Regex.replace All (regex "[-\\s]+") (always "_")
+        |> String.toLower

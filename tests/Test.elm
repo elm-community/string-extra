@@ -1,6 +1,7 @@
 module Test exposing (..)
 
 import String.Extra exposing (..)
+import Char
 import String exposing (uncons, fromChar, toUpper, toLower)
 import Check exposing (Claim, Evidence, suite, claim, that, is, for, true, false, quickCheck)
 import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4)
@@ -9,6 +10,7 @@ import Check.Producer exposing (Producer)
 import Regex
 import ElmTest
 import CamelizeTest exposing (camelizeClaims)
+import UnderscoredTest exposing (underscoredClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -301,6 +303,7 @@ evidence =
         , camelizeClaims
         , classifyClaims
         , surroundClaims
+        , underscoredClaims
         ]
         |> quickCheck
 
