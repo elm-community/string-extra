@@ -56,7 +56,7 @@ toTitleCaseClaims =
 replaceClaims : Claim
 replaceClaims =
     suite "replace"
-        [ claim "It substitues all occurences of the same sequence"
+        [ claim "It substitutes all occurences of the same sequence"
             `that` (\( string, substitute ) -> replace string substitute string)
             `is` (\( string, substitute ) -> substitute)
             `for` tuple ( string, string )
@@ -275,6 +275,16 @@ classifyClaims =
         ]
 
 
+surroundClaims : Claim
+surroundClaims =
+    suite "surround"
+        [ claim "It surrounds the given string with the given wrapper"
+            `that` (\( string, wrap ) -> surround string wrap)
+            `is` (\( string, wrap ) -> wrap ++ string ++ wrap)
+            `for` tuple ( string, string )
+        ]
+
+
 evidence : Evidence
 evidence =
     suite "String.Extra"
@@ -290,6 +300,7 @@ evidence =
         , isBlankClaims
         , camelizeClaims
         , classifyClaims
+        , surroundClaims
         ]
         |> quickCheck
 

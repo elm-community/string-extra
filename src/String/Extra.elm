@@ -12,6 +12,7 @@ module String.Extra
         , isBlank
         , camelize
         , classify
+        , surround
         )
 
 {-| Additional functions for working with Strings
@@ -31,6 +32,10 @@ module String.Extra
 ## Checks
 
 @docs isBlank
+
+## Miscellaneous
+
+@docs surround
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -238,3 +243,13 @@ classify string =
         |> camelize
         |> replace " " ""
         |> toSentenceCase
+
+
+{-| Surrounds a string with another string.
+
+   surround "foo" "bar" === "barfoobar"
+
+-}
+surround : String -> String -> String
+surround string wrap =
+    wrap ++ string ++ wrap
