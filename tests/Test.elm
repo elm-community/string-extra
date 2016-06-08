@@ -1,7 +1,6 @@
 module Test exposing (..)
 
 import String.Extra exposing (..)
-import Char
 import String exposing (uncons, fromChar, toUpper, toLower)
 import Check exposing (Claim, Evidence, suite, claim, that, is, for, true, false, quickCheck)
 import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4)
@@ -280,9 +279,21 @@ classifyClaims =
 surroundClaims : Claim
 surroundClaims =
     suite "surround"
-        [ claim "It surrounds the given string with the given wrapper"
-            `that` (\( string, wrap ) -> surround string wrap)
-            `is` (\( string, wrap ) -> wrap ++ string ++ wrap)
+        [ claim "It starts with the wrapping string"
+            `true` (\( string, wrap ) -> surround string wrap |> String.startsWith wrap)
+            `for` tuple ( string, string )
+        , claim "It ends with the wrapping string"
+            `true` (\( string, wrap ) -> surround string wrap |> String.endsWith wrap)
+            `for` tuple ( string, string )
+        , claim "It contains the original string"
+            `true` (\( string, wrap ) -> surround string wrap |> String.contains string)
+            `for` tuple ( string, string )
+        , claim "It does not have anythig  else inside"
+            `true` (\( string, wrap ) ->
+                        surround string wrap
+                            |> String.length
+                            |> (==) ((String.length string) + (2 * String.length wrap))
+                   )
             `for` tuple ( string, string )
         ]
 
