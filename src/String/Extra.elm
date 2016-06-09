@@ -11,17 +11,18 @@ module String.Extra
         , clean
         , isBlank
         , camelize
+        , underscored
+        , dasherize
         , classify
         , quote
         , surround
-        , underscored
         )
 
 {-| Additional functions for working with Strings
 
 ## Change words casing
 
-@docs toSentenceCase, toTitleCase, decapitalize, camelize, classify, underscored
+@docs toSentenceCase, toTitleCase, decapitalize, camelize, classify, underscored, dasherize
 
 ## Replace and Splice
 
@@ -257,7 +258,8 @@ quote string =
 
 
 {-| Returns a string joined by underscores after separating it by its uppercase characters.
-Any sequence of spaces or dashes will also be converted to a single underscore
+Any sequence of spaces or dashes will also be converted to a single underscore.
+The final string will be lowercased
 
    underscore "SomeClassName" === "some_class_name"
    underscore "some-class-name" = "some_class_name"
@@ -270,4 +272,22 @@ underscored string =
         |> String.trim
         |> Regex.replace All (regex "([a-z\\d])([A-Z]+)") (.submatches >> List.map (Maybe.withDefault "") >> String.join "_")
         |> Regex.replace All (regex "[-\\s]+") (always "_")
+        |> String.toLower
+
+
+{-| Returns a string joined by dashes after separating it by its uppercase characters.
+Any sequence of spaces or underscored will also be converted to a single dash.
+The final string will be lowercased
+
+   dasherize "SomeClassName" === "-some-class-name"
+   dasherize "some_class_name" = "some-class-name"
+   dasherize "someClass name" = "some-class-name
+
+-}
+dasherize : String -> String
+dasherize string =
+    string
+        |> String.trim
+        |> Regex.replace All (regex "([A-Z])") (.match >> String.append "-")
+        |> Regex.replace All (regex "[_-\\s]+") (always "-")
         |> String.toLower

@@ -10,6 +10,7 @@ import Regex
 import ElmTest
 import CamelizeTest exposing (camelizeClaims)
 import UnderscoredTest exposing (underscoredClaims)
+import DasherizeTest exposing (dasherizeClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -315,6 +316,7 @@ evidence =
         , classifyClaims
         , surroundClaims
         , underscoredClaims
+        , dasherizeClaims
         ]
         |> quickCheck
 
