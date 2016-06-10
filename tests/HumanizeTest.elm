@@ -2,7 +2,7 @@ module HumanizeTest exposing (humanizeClaims)
 
 import String.Extra exposing (..)
 import String
-import Check exposing (Claim, suite, claim, that, is, for, true)
+import Check exposing (Claim, suite, claim, that, is, for, true, false)
 import Check.Producer exposing (string, filter)
 import Char
 import Regex
@@ -30,6 +30,12 @@ humanizeClaims =
             `that` (humanize >> String.toLower)
             `is` (replaceUppercase >> String.toLower >> String.trim)
             `for` filter (Regex.contains (Regex.regex "^[a-zA-Z]$")) string
+        , claim "It does not leave double spaces around"
+            `false` (humanize >> String.contains "  ")
+            `for` string
+        , claim "It strips the _id at the end"
+            `false` ((flip String.append) "_id" >> humanize >> String.endsWith "id")
+            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z_-]$")) string
         ]
 
 
