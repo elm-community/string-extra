@@ -9,6 +9,8 @@ import Check.Producer exposing (Producer)
 import Regex
 import ElmTest
 import CamelizeTest exposing (camelizeClaims)
+import UnderscoredTest exposing (underscoredClaims)
+import DasherizeTest exposing (dasherizeClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -278,9 +280,21 @@ classifyClaims =
 surroundClaims : Claim
 surroundClaims =
     suite "surround"
-        [ claim "It surrounds the given string with the given wrapper"
-            `that` (\( string, wrap ) -> surround string wrap)
-            `is` (\( string, wrap ) -> wrap ++ string ++ wrap)
+        [ claim "It starts with the wrapping string"
+            `true` (\( string, wrap ) -> surround string wrap |> String.startsWith wrap)
+            `for` tuple ( string, string )
+        , claim "It ends with the wrapping string"
+            `true` (\( string, wrap ) -> surround string wrap |> String.endsWith wrap)
+            `for` tuple ( string, string )
+        , claim "It contains the original string"
+            `true` (\( string, wrap ) -> surround string wrap |> String.contains string)
+            `for` tuple ( string, string )
+        , claim "It does not have anythig  else inside"
+            `true` (\( string, wrap ) ->
+                        surround string wrap
+                            |> String.length
+                            |> (==) ((String.length string) + (2 * String.length wrap))
+                   )
             `for` tuple ( string, string )
         ]
 
@@ -301,6 +315,8 @@ evidence =
         , camelizeClaims
         , classifyClaims
         , surroundClaims
+        , underscoredClaims
+        , dasherizeClaims
         ]
         |> quickCheck
 
