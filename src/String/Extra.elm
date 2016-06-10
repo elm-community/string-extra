@@ -14,6 +14,7 @@ module String.Extra
         , underscored
         , dasherize
         , classify
+        , humanize
         , quote
         , surround
         )
@@ -22,7 +23,13 @@ module String.Extra
 
 ## Change words casing
 
-@docs toSentenceCase, toTitleCase, decapitalize, camelize, classify, underscored, dasherize
+@docs toSentenceCase, toTitleCase, decapitalize
+
+## Inflector functions
+
+Functions borrowed from the Rails Inflector class
+
+@docs camelize, classify, underscored, dasherize, humanize
 
 ## Replace and Splice
 
@@ -281,7 +288,7 @@ The final string will be lowercased
 
    dasherize "SomeClassName" === "-some-class-name"
    dasherize "some_class_name" = "some-class-name"
-   dasherize "someClass name" = "some-class-name
+   dasherize "someClass name" = "some-class-name"
 
 -}
 dasherize : String -> String
@@ -291,3 +298,23 @@ dasherize string =
         |> Regex.replace All (regex "([A-Z])") (.match >> String.append "-")
         |> Regex.replace All (regex "[_-\\s]+") (always "-")
         |> String.toLower
+
+
+{-| Converts an underscored, camelized, or dasherized string into one that can be read by humans.
+Also removes beginning and ending whitespace, and removes the postfix '_id'.
+The first character will be capitalized
+
+   humanize "this_is_great" === "This is great"
+   humanize "ThisIsGreat" = "This is great"
+   humanize "this-is-great" = "This is great"
+   humanize "author_id" = "Author"
+
+-}
+humanize : String -> String
+humanize string =
+    string
+        |> Regex.replace All (regex "([A-Z])") (.match >> String.append "-")
+        |> Regex.replace All (regex "_id$|[-_\\s]+") (always " ")
+        |> String.trim
+        |> String.toLower
+        |> toSentenceCase

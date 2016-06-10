@@ -11,6 +11,7 @@ import ElmTest
 import CamelizeTest exposing (camelizeClaims)
 import UnderscoredTest exposing (underscoredClaims)
 import DasherizeTest exposing (dasherizeClaims)
+import HumanizeTest exposing (humanizeClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -317,6 +318,7 @@ evidence =
         , surroundClaims
         , underscoredClaims
         , dasherizeClaims
+        , humanizeClaims
         ]
         |> quickCheck
 
