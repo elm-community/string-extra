@@ -31,7 +31,7 @@ This package is an effort to consolidate [lorenzo/elm-string-addons](https://git
 [NoRedInk/elm-string-extra](https://github.com/NoRedInk/elm-string-extra), and
 add utility functions inspired by [underscore.string](http://epeli.github.io/underscore.string/).
 
-So thanks to the authors of those libraries for making `elm-string` possible.
+So thanks to the authors of those libraries for making `string-extra` possible.
 
 License
 -------
