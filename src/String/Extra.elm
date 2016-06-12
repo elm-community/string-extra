@@ -17,6 +17,7 @@ module String.Extra
         , humanize
         , quote
         , surround
+        , unindent
         )
 
 {-| Additional functions for working with Strings
@@ -45,7 +46,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Miscellaneous
 
-@docs surround, quote
+@docs surround, quote, unindent
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -318,3 +319,49 @@ humanize string =
         |> String.trim
         |> String.toLower
         |> toSentenceCase
+
+
+{-| Removes the least sequence of leading spaces or tabs on each line
+of the string, so that at least one of the lines will not have any
+leading spaces nor tabs and the rest of the lines will have the same
+amount of indentation removed.
+
+    unindent "  Hello\n    World " === "Hello\n  World"
+    unindent "\t\tHello\n\t\t\t\tWorld" === "Hello\n\t\tWorld"
+
+-}
+unindent : String -> String
+unindent multilineSting =
+    let
+        lines =
+            String.lines multilineSting
+
+        countLeadingWhitespace count line =
+            case String.uncons line of
+                Nothing ->
+                    count
+
+                Just ( char, rest ) ->
+                    case char of
+                        ' ' ->
+                            countLeadingWhitespace (count + 1) rest
+
+                        '\t' ->
+                            countLeadingWhitespace (count + 1) rest
+
+                        _ ->
+                            count
+
+        isNotWhitespace char =
+            char /= ' ' && char /= '\t'
+
+        minLead =
+            lines
+                |> List.filter (String.any isNotWhitespace)
+                |> List.map (countLeadingWhitespace 0)
+                |> List.minimum
+                |> Maybe.withDefault 0
+    in
+        lines
+            |> List.map (String.dropLeft minLead)
+            |> String.join "\n"

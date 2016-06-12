@@ -3,7 +3,7 @@ module Test exposing (..)
 import String.Extra exposing (..)
 import String exposing (uncons, fromChar, toUpper, toLower)
 import Check exposing (Claim, Evidence, suite, claim, that, is, for, true, false, quickCheck)
-import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4)
+import Check.Producer exposing (string, list, tuple, filter, rangeInt, tuple3, tuple4, map)
 import Check.Test
 import Check.Producer exposing (Producer)
 import Regex
@@ -12,6 +12,7 @@ import CamelizeTest exposing (camelizeClaims)
 import UnderscoredTest exposing (underscoredClaims)
 import DasherizeTest exposing (dasherizeClaims)
 import HumanizeTest exposing (humanizeClaims)
+import UnindentTest exposing (unindentClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -300,6 +301,7 @@ surroundClaims =
         ]
 
 
+
 evidence : Evidence
 evidence =
     suite "String.Extra"
@@ -319,6 +321,7 @@ evidence =
         , underscoredClaims
         , dasherizeClaims
         , humanizeClaims
+        , unindentClaims
         ]
         |> quickCheck
 
