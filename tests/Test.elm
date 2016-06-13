@@ -291,7 +291,7 @@ surroundClaims =
         , claim "It contains the original string"
             `true` (\( string, wrap ) -> surround string wrap |> String.contains string)
             `for` tuple ( string, string )
-        , claim "It does not have anythig  else inside"
+        , claim "It does not have anythig else inside"
             `true` (\( string, wrap ) ->
                         surround string wrap
                             |> String.length
@@ -300,6 +300,24 @@ surroundClaims =
             `for` tuple ( string, string )
         ]
 
+
+countOccurrencesClaims : Claim
+countOccurrencesClaims =
+    suite "countOccurrences"
+        [ claim "Removing the occurrences should yield the right length"
+            `true` (\( needle, haystack ) ->
+                        let
+                            replacedLength =
+                                replace needle "" haystack |> String.length
+
+                            times =
+                                countOccurrences needle haystack
+                        in
+                            replacedLength == (String.length haystack - (times * (String.length needle)))
+                   )
+            `for` filter (\( needle, haystack ) -> String.contains needle haystack)
+                    (tuple ( string, string ))
+        ]
 
 
 evidence : Evidence
@@ -322,6 +340,7 @@ evidence =
         , dasherizeClaims
         , humanizeClaims
         , unindentClaims
+        , countOccurrencesClaims
         ]
         |> quickCheck
 

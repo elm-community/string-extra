@@ -18,6 +18,7 @@ module String.Extra
         , quote
         , surround
         , unindent
+        , countOccurrences
         )
 
 {-| Additional functions for working with Strings
@@ -46,7 +47,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Miscellaneous
 
-@docs surround, quote, unindent
+@docs surround, quote, unindent, countOccurrences
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -365,3 +366,19 @@ unindent multilineSting =
         lines
             |> List.map (String.dropLeft minLead)
             |> String.join "\n"
+
+
+{-| Returns the number of occurrences of a substring in another string
+
+   countOccurrences "Hello" "Hello World" === 1
+   countOccurrences "o" "Hello World" === 2
+
+-}
+countOccurrences : String -> String -> Int
+countOccurrences needle haystack =
+    if (String.length needle) == 0 || (String.length haystack) == 0 then
+        0
+    else
+        haystack
+            |> String.indexes needle
+            |> List.length
