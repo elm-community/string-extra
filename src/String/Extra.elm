@@ -19,6 +19,8 @@ module String.Extra
         , surround
         , unindent
         , countOccurrences
+        , ellipsis
+        , ellipsisWith
         )
 
 {-| Additional functions for working with Strings
@@ -43,11 +45,12 @@ Functions borrowed from the Rails Inflector class
 
 ## Checks
 
-@docs isBlank
+@docs isBlank, countOccurrences
 
-## Miscellaneous
+## Formatting
 
-@docs surround, quote, unindent, countOccurrences
+@docs clean, quote, surround, unindent, ellipsis, ellipsisWith
+
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -372,7 +375,6 @@ unindent multilineSting =
 
    countOccurrences "Hello" "Hello World" === 1
    countOccurrences "o" "Hello World" === 2
-
 -}
 countOccurrences : String -> String -> Int
 countOccurrences needle haystack =
@@ -382,3 +384,40 @@ countOccurrences needle haystack =
         haystack
             |> String.indexes needle
             |> List.length
+
+
+{-| Truncates the string at the specified lenght and adds the append
+string only if the combined lenght of the truncated string and the append
+string have exactly the desired lenght.
+
+The resulting string will have at most the specified lenght
+
+   ellipsisWith 5 " .." "Hello World" === "Hello .."
+   ellipsisWith 10 " .."  "Hello World" === "Hello W..."
+   ellipsisWith 10 " .." "Hello" === "Hello"
+   ellipsisWith 8 " .." "Hello World" === "Hello World"
+
+-}
+ellipsisWith : Int -> String -> String -> String
+ellipsisWith howLong append string =
+    if String.length string <= howLong then
+        string
+    else
+        (String.left (howLong - (String.length append)) string) ++ append
+
+
+{-| Truncates the string at the specified lenght and appends
+three dots only if the tructated string + the 3 dots have exactly
+the desired lenght.
+
+The resulting string will have at most the specified lenght
+
+   ellipsis 5 "Hello World" === "Hello..."
+   ellipsis 10 "Hello World" === "Hello W..."
+   ellipsis 10 "Hello" === "Hello"
+   ellipsis 8 "Hello World" === "Hello World"
+
+-}
+ellipsis : Int -> String -> String
+ellipsis howLong string =
+    ellipsisWith howLong "..." string

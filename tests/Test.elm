@@ -320,6 +320,43 @@ countOccurrencesClaims =
         ]
 
 
+ellipsisClaims : Claim
+ellipsisClaims =
+    suite "ellipsis"
+        [ claim "The resulting string lenght does not exceed the specified length"
+            `true` (\( howLong, string ) ->
+                      ellipsis howLong string
+                        |> String.length
+                        |> (>=) howLong
+                   )
+            `for` (tuple ( rangeInt 3 20, string ))
+        , claim "The resulting string contains three dots and the end if necessary"
+            `true` (\( howLong, string ) ->
+                      ellipsis howLong string
+                        |> String.endsWith "..."
+                   )
+            `for` filter
+              (\( howLong, string ) -> String.length string >= howLong + 3)
+              (tuple ( rangeInt 0 20, string ))
+        , claim "It starts with the left of the original string"
+            `true` (\( howLong, string ) ->
+                      string
+                        |> String.startsWith (ellipsis howLong string |> String.dropRight 3)
+                   )
+            `for` filter
+              (\( howLong, string ) -> String.length string >= howLong + 3)
+              (tuple ( rangeInt 0 20, string ))
+        , claim "The resulting string does not contain three dots if it is short enough"
+            `true` (\( howLong, string ) ->
+                      ellipsis howLong string
+                        |> String.endsWith "..."
+                        |> not
+                   )
+            `for` filter
+              (\( howLong, string ) -> String.length string <= howLong)
+              (tuple ( rangeInt 0 20, string ))
+        ]
+
 evidence : Evidence
 evidence =
     suite "String.Extra"
@@ -341,6 +378,7 @@ evidence =
         , humanizeClaims
         , unindentClaims
         , countOccurrencesClaims
+        , ellipsisClaims
         ]
         |> quickCheck
 
