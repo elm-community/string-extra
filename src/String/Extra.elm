@@ -20,6 +20,7 @@ module String.Extra
         , unindent
         , countOccurrences
         , ellipsis
+        , softEllipsis
         , ellipsisWith
         )
 
@@ -49,7 +50,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Formatting
 
-@docs clean, quote, surround, unindent, ellipsis, ellipsisWith
+@docs clean, quote, surround, unindent, ellipsis, softEllipsis, ellipsisWith
 
 -}
 
@@ -138,7 +139,7 @@ replaceSlice substitution start end string =
 
 {-| Inserts a substring at the specified index.
 
-    insertAt "world" 6 "Hello " === "Hello world"
+    insertAt "world" 6 "Hello " == "Hello world"
 -}
 insertAt : String -> Int -> String -> String
 insertAt insert pos string =
@@ -183,9 +184,13 @@ softBreak width string =
         []
     else
         string
-            |> Regex.find All (regex <| ".{1," ++ (toString width) ++ "}(\\s|$)|\\S+?(\\s|$)")
+            |> Regex.find All (softBreakRegexp width)
             |> List.map (.match)
 
+
+softBreakRegexp : Int -> Regex.Regex
+softBreakRegexp width =
+  regex <| ".{1," ++ (toString width) ++ "}(\\s|$)|\\S+?(\\s|$)"
 
 {-| Trims the whitespace of both sides of the string and compresses
 reapeated whitespace internally to a single whitespace char.
@@ -202,10 +207,10 @@ clean string =
 
 {-| Tests if a string is empty or only contains whitespace
 
-   isBlank "" === True
-   isBlank "\n" === True
-   isBlank "  " === True
-   isBlank " a" === False
+   isBlank "" == True
+   isBlank "\n" == True
+   isBlank "  " == True
+   isBlank " a" == False
 
 -}
 isBlank : String -> Bool
@@ -215,7 +220,7 @@ isBlank string =
 
 {-| Converts underscored or dasherized string to a camelized one.
 
-   camelize "-moz-transform" === "MozTransform"
+   camelize "-moz-transform" == "MozTransform"
 
 -}
 camelize : String -> String
@@ -236,8 +241,8 @@ camelize string =
 {-| Converts string to camelized string starting with an uppercase.
 All non word characters will be stripped out of the original string.
 
-   classify "some_class_name" === "SomeClassName"
-   classify "myLittleCamel.class.name" === "MyLittleCamelClassName"
+   classify "some_class_name" == "SomeClassName"
+   classify "myLittleCamel.class.name" == "MyLittleCamelClassName"
 
 -}
 classify : String -> String
@@ -251,7 +256,7 @@ classify string =
 
 {-| Surrounds a string with another string.
 
-   surround "foo" "bar" === "barfoobar"
+   surround "foo" "bar" == "barfoobar"
 
 -}
 surround : String -> String -> String
@@ -261,7 +266,7 @@ surround string wrap =
 
 {-| surrounds a string with another string.
 
-   quote "foo" === "\"barfoobar\""
+   quote "foo" == "\"barfoobar\""
 
 -}
 quote : String -> String
@@ -273,7 +278,7 @@ quote string =
 Any sequence of spaces or dashes will also be converted to a single underscore.
 The final string will be lowercased
 
-   underscore "SomeClassName" === "some_class_name"
+   underscore "SomeClassName" == "some_class_name"
    underscore "some-class-name" = "some_class_name"
    underscore "SomeClass name" = "some_class_name
 
@@ -291,7 +296,7 @@ underscored string =
 Any sequence of spaces or underscored will also be converted to a single dash.
 The final string will be lowercased
 
-   dasherize "SomeClassName" === "-some-class-name"
+   dasherize "SomeClassName" == "-some-class-name"
    dasherize "some_class_name" = "some-class-name"
    dasherize "someClass name" = "some-class-name"
 
@@ -309,7 +314,7 @@ dasherize string =
 Also removes beginning and ending whitespace, and removes the postfix '_id'.
 The first character will be capitalized
 
-   humanize "this_is_great" === "This is great"
+   humanize "this_is_great" == "This is great"
    humanize "ThisIsGreat" = "This is great"
    humanize "this-is-great" = "This is great"
    humanize "author_id" = "Author"
@@ -330,8 +335,8 @@ of the string, so that at least one of the lines will not have any
 leading spaces nor tabs and the rest of the lines will have the same
 amount of indentation removed.
 
-    unindent "  Hello\n    World " === "Hello\n  World"
-    unindent "\t\tHello\n\t\t\t\tWorld" === "Hello\n\t\tWorld"
+    unindent "  Hello\n    World " == "Hello\n  World"
+    unindent "\t\tHello\n\t\t\t\tWorld" == "Hello\n\t\tWorld"
 
 -}
 unindent : String -> String
@@ -373,8 +378,8 @@ unindent multilineSting =
 
 {-| Returns the number of occurrences of a substring in another string
 
-   countOccurrences "Hello" "Hello World" === 1
-   countOccurrences "o" "Hello World" === 2
+   countOccurrences "Hello" "Hello World" == 1
+   countOccurrences "o" "Hello World" == 2
 -}
 countOccurrences : String -> String -> Int
 countOccurrences needle haystack =
@@ -392,10 +397,10 @@ string have exactly the desired lenght.
 
 The resulting string will have at most the specified lenght
 
-   ellipsisWith 5 " .." "Hello World" === "Hello .."
-   ellipsisWith 10 " .."  "Hello World" === "Hello W..."
-   ellipsisWith 10 " .." "Hello" === "Hello"
-   ellipsisWith 8 " .." "Hello World" === "Hello World"
+   ellipsisWith 5 " .." "Hello World" == "Hello .."
+   ellipsisWith 10 " .."  "Hello World" == "Hello W..."
+   ellipsisWith 10 " .." "Hello" == "Hello"
+   ellipsisWith 8 " .." "Hello World" == "Hello World"
 
 -}
 ellipsisWith : Int -> String -> String -> String
@@ -406,18 +411,49 @@ ellipsisWith howLong append string =
         (String.left (howLong - (String.length append)) string) ++ append
 
 
-{-| Truncates the string at the specified lenght and appends
+{-| Truncates the string at the specified length and appends
 three dots only if the tructated string + the 3 dots have exactly
 the desired lenght.
 
 The resulting string will have at most the specified lenght
 
-   ellipsis 5 "Hello World" === "Hello..."
-   ellipsis 10 "Hello World" === "Hello W..."
-   ellipsis 10 "Hello" === "Hello"
-   ellipsis 8 "Hello World" === "Hello World"
+   ellipsis 5 "Hello World" == "Hello..."
+   ellipsis 10 "Hello World" == "Hello W..."
+   ellipsis 10 "Hello" == "Hello"
+   ellipsis 8 "Hello World" == "Hello World"
 
 -}
 ellipsis : Int -> String -> String
 ellipsis howLong string =
     ellipsisWith howLong "..." string
+
+{-| Truncates the string at the specified length and appends
+three dots only if the tructated string + the 3 dots have exactly
+the desired lenght.
+
+In constrast to `ellipsis`, this method will produced unfinished words,
+instead, it will find the closest complete word and apply the ellipsis from
+there, without exceeding the specified lenght.
+
+Additionally, it will remove any trailing whitespace and punctuation characters
+at the end of the truncated string.
+
+The resulting string will have at most the specified lenght
+
+   softEllipsis 5 "Hello, World" == "Hello..."
+   softEllipsis 8 "Hello, World" == "Hello..."
+   softEllipsis 15 "Hello, cruel world" == "Hello, cruel..."
+   softEllipsis 10 "Hello" == "Hello"
+
+-}
+softEllipsis : Int -> String -> String
+softEllipsis howLong string =
+    if String.length string <= howLong then
+        string
+    else
+      string
+        |> Regex.find (AtMost 1) (softBreakRegexp howLong)
+        |> List.map .match
+        |> String.join ""
+        |> Regex.replace All (regex "([\\.,;:\\s])+$") (always "")
+        |> flip String.append "..."
