@@ -433,12 +433,13 @@ the desired lenght.
 
 In constrast to `ellipsis`, this method will produced unfinished words,
 instead, it will find the closest complete word and apply the ellipsis from
-there, without exceeding the specified lenght.
+there.
 
 Additionally, it will remove any trailing whitespace and punctuation characters
 at the end of the truncated string.
 
-The resulting string will have at most the specified lenght
+The resulting stirng can in some cases exceed the specifed lenght, by at most
+three characters.
 
    softEllipsis 5 "Hello, World" == "Hello..."
    softEllipsis 8 "Hello, World" == "Hello..."
