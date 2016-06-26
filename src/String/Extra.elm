@@ -22,6 +22,8 @@ module String.Extra
         , ellipsis
         , softEllipsis
         , ellipsisWith
+        , toSentence
+        , toSentenceOxford
         )
 
 {-| Additional functions for working with Strings
@@ -51,6 +53,10 @@ Functions borrowed from the Rails Inflector class
 ## Formatting
 
 @docs clean, quote, surround, unindent, ellipsis, softEllipsis, ellipsisWith
+
+## Converting Lists
+
+@docs toSentence, toSentenceOxford
 
 -}
 
@@ -190,7 +196,8 @@ softBreak width string =
 
 softBreakRegexp : Int -> Regex.Regex
 softBreakRegexp width =
-  regex <| ".{1," ++ (toString width) ++ "}(\\s|$)|\\S+?(\\s|$)"
+    regex <| ".{1," ++ (toString width) ++ "}(\\s|$)|\\S+?(\\s|$)"
+
 
 {-| Trims the whitespace of both sides of the string and compresses
 reapeated whitespace internally to a single whitespace char.
@@ -427,6 +434,7 @@ ellipsis : Int -> String -> String
 ellipsis howLong string =
     ellipsisWith howLong "..." string
 
+
 {-| Truncates the string at the specified length and appends
 three dots only if the tructated string + the 3 dots have exactly
 the desired lenght.
@@ -452,9 +460,69 @@ softEllipsis howLong string =
     if String.length string <= howLong then
         string
     else
-      string
-        |> Regex.find (AtMost 1) (softBreakRegexp howLong)
-        |> List.map .match
-        |> String.join ""
-        |> Regex.replace All (regex "([\\.,;:\\s])+$") (always "")
-        |> flip String.append "..."
+        string
+            |> Regex.find (AtMost 1) (softBreakRegexp howLong)
+            |> List.map .match
+            |> String.join ""
+            |> Regex.replace All (regex "([\\.,;:\\s])+$") (always "")
+            |> flip String.append "..."
+
+
+{-| Converts a list of strings into a human formatted readable list
+    toSentence [] == ""
+    toSentence ["lions"] == "lions"
+    toSentence ["lions", "tigers"] == "lions and tigers"
+    toSentence ["lions", "tigers", "bears"] == "lions, tigers and bears"
+
+-}
+toSentence : List String -> String
+toSentence list =
+    case list of
+        x :: y :: z :: more ->
+            toSentenceHelper " and " (x ++ ", " ++ y ++ ", " ++ z) more
+
+        _ ->
+            toSentenceBaseCase list
+
+
+{-| Converts a list of strings into a human formatted readable list using an oxford comma
+    toSentence [] == ""
+    toSentence ["lions"] == "lions"
+    toSentence ["lions", "tigers"] == "lions and tigers"
+    toSentence ["lions", "tigers", "bears"] == "lions, tigers, and bears"
+
+-}
+toSentenceOxford : List String -> String
+toSentenceOxford list =
+    case list of
+        x :: y :: z :: more ->
+            toSentenceHelper ", and " (x ++ ", " ++ y ++ ", " ++ z) more
+
+        _ ->
+            toSentenceBaseCase list
+
+
+toSentenceBaseCase : List String -> String
+toSentenceBaseCase list =
+    case list of
+        x :: [] ->
+            x
+
+        x :: y :: [] ->
+            x ++ " and " ++ y
+
+        _ ->
+            ""
+
+
+toSentenceHelper : String -> String -> List String -> String
+toSentenceHelper lastPart sentence list =
+    case list of
+        [] ->
+            sentence
+
+        x :: [] ->
+            sentence ++ lastPart ++ x
+
+        x :: xs ->
+            toSentenceHelper lastPart (sentence ++ ", " ++ x) xs
