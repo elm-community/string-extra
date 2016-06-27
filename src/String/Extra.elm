@@ -24,6 +24,7 @@ module String.Extra
         , ellipsisWith
         , toSentence
         , toSentenceOxford
+        , stripTags
         )
 
 {-| Additional functions for working with Strings
@@ -52,7 +53,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Formatting
 
-@docs clean, quote, surround, unindent, ellipsis, softEllipsis, ellipsisWith
+@docs clean, quote, surround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
 
 ## Converting Lists
 
@@ -526,3 +527,14 @@ toSentenceHelper lastPart sentence list =
 
         x :: xs ->
             toSentenceHelper lastPart (sentence ++ ", " ++ x) xs
+
+
+{-| Removes all HTML tags from the string, preserving the text inside them.
+    stripTags "a <a href=\"#\">link</a>" == "a link"
+    stripTags "<script>alert('hello world!')</script> == "alert('hello world!')"
+
+-}
+stripTags : String -> String
+stripTags string =
+    string
+        |> Regex.replace All (regex "<\\/?[^>]+>") (always "")
