@@ -479,7 +479,7 @@ toSentence : List String -> String
 toSentence list =
     case list of
         x :: y :: z :: more ->
-            toSentenceHelper " and " (x ++ ", " ++ y ++ ", " ++ z) more
+            toSentenceHelper " and " (x ++ ", " ++ y) (z :: more)
 
         _ ->
             toSentenceBaseCase list
@@ -496,7 +496,7 @@ toSentenceOxford : List String -> String
 toSentenceOxford list =
     case list of
         x :: y :: z :: more ->
-            toSentenceHelper ", and " (x ++ ", " ++ y ++ ", " ++ z) more
+            toSentenceHelper ", and " (x ++ ", " ++ y) (z :: more)
 
         _ ->
             toSentenceBaseCase list
