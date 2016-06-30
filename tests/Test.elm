@@ -347,11 +347,10 @@ ellipsisClaims =
               (\( howLong, string ) -> String.length string >= howLong + 3)
               (tuple ( rangeInt 0 20, string ))
         , claim "The resulting string does not contain three dots if it is short enough"
-            `true` (\( howLong, string ) ->
+            `false` (\( howLong, string ) ->
                       ellipsis howLong string
                         |> String.endsWith "..."
-                        |> not
-                   )
+                    )
             `for` filter
               (\( howLong, string ) -> String.length string <= howLong)
               (tuple ( rangeInt 0 20, string ))
@@ -364,6 +363,28 @@ unquoteClaims =
         [ claim "Removes quotes from all strings"
             `false` (unquote >> Regex.contains (Regex.regex "\""))
             `for` string
+        ]
+
+
+wrapClaims : Claim
+wrapClaims =
+    suite "wrap"
+        [ claim "Wraps given string at the requested length"
+            `true` (\(howLong, string) ->
+                      wrap howLong string
+                        |> String.split "\n"
+                        |> List.map (\str -> String.length str <= howLong)
+                        |> List.all ((==) True)
+                   )
+            `for` tuple (rangeInt 1 20, string)
+        , claim "Does not wrap strings that are shorter than the requested length"
+            `false` (\(howLong, string) ->
+                      wrap howLong string
+                        |> String.contains "\n"
+                    )
+            `for` filter
+              (\(howLong, string) -> String.length string <= howLong)
+              (tuple (rangeInt 1 20, string))
         ]
 
 
@@ -390,6 +411,7 @@ evidence =
         , countOccurrencesClaims
         , ellipsisClaims
         , unquoteClaims
+        , wrapClaims
         ]
         |> quickCheck
 
