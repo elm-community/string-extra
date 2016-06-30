@@ -357,6 +357,16 @@ ellipsisClaims =
               (tuple ( rangeInt 0 20, string ))
         ]
 
+
+unquoteClaims : Claim
+unquoteClaims =
+    suite "unquote"
+        [ claim "Removes quotes from all strings"
+            `false` (unquote >> Regex.contains (Regex.regex "\""))
+            `for` string
+        ]
+
+
 evidence : Evidence
 evidence =
     suite "String.Extra"
@@ -379,6 +389,7 @@ evidence =
         , unindentClaims
         , countOccurrencesClaims
         , ellipsisClaims
+        , unquoteClaims
         ]
         |> quickCheck
 

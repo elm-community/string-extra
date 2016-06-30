@@ -16,6 +16,7 @@ module String.Extra
         , classify
         , humanize
         , quote
+        , unquote
         , surround
         , wrap
         , wrapWith
@@ -59,7 +60,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Formatting
 
-@docs clean, quote, surround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
+@docs clean, quote, unquote, surround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
 
 ## Converting Lists
 
@@ -278,7 +279,7 @@ surround string wrap =
     wrap ++ string ++ wrap
 
 
-{-| surrounds a string with another string.
+{-| Adds quotes to a string.
 
    quote "foo" == "\"barfoobar\""
 
@@ -288,13 +289,23 @@ quote string =
     surround string "\""
 
 
+{-| Removes quotes from a string.
+
+   unquote "\"foo\"" == "foo"
+
+-}
+unquote : String -> String
+unquote string =
+    replace "\"" "" string
+
+
 {-| Returns a string joined by underscores after separating it by its uppercase characters.
 Any sequence of spaces or dashes will also be converted to a single underscore.
 The final string will be lowercased
 
    underscore "SomeClassName" == "some_class_name"
-   underscore "some-class-name" = "some_class_name"
-   underscore "SomeClass name" = "some_class_name
+   underscore "some-class-name" == "some_class_name"
+   underscore "SomeClass name" == "some_class_name
 
 -}
 underscored : String -> String
