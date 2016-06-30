@@ -17,6 +17,8 @@ module String.Extra
         , humanize
         , quote
         , surround
+        , wrap
+        , wrapWith
         , unindent
         , countOccurrences
         , ellipsis
@@ -46,6 +48,10 @@ Functions borrowed from the Rails Inflector class
 ## Splitting
 
 @docs break, softBreak
+
+## Wrapping
+
+@docs wrap, wrapWith
 
 ## Checks
 
@@ -316,6 +322,33 @@ dasherize string =
         |> Regex.replace All (regex "([A-Z])") (.match >> String.append "-")
         |> Regex.replace All (regex "[_-\\s]+") (always "-")
         |> String.toLower
+
+
+{-| Separates a string into parts of a given width, using a given seperator.
+
+Look at `wrap` if you just want to wrap using newlines.
+
+    wrapWith 7 "\n" "My very long text" === "My very\nlong text"
+    wrapWith 100 "\n" "Too short" === "Too short"
+
+-}
+wrapWith : Int -> String -> String -> String
+wrapWith width separator string =
+    string
+        |> break width
+        |> String.join separator
+
+
+{-| Chops a given string into parts of a given width, seperating them using a
+new line.
+
+    wrap 7 "My very long text" === "My very\nlong te\nxt"
+    wrap 100 "Too short" === "Too short"
+
+-}
+wrap : Int -> String -> String
+wrap width string =
+    wrapWith width "\n" string
 
 
 {-| Converts an underscored, camelized, or dasherized string into one that can be read by humans.
