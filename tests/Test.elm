@@ -283,17 +283,17 @@ surroundClaims : Claim
 surroundClaims =
     suite "surround"
         [ claim "It starts with the wrapping string"
-            `true` (\( string, wrap ) -> surround string wrap |> String.startsWith wrap)
+            `true` (\( string, wrap ) -> surround wrap string |> String.startsWith wrap)
             `for` tuple ( string, string )
         , claim "It ends with the wrapping string"
-            `true` (\( string, wrap ) -> surround string wrap |> String.endsWith wrap)
+            `true` (\( string, wrap ) -> surround wrap string |> String.endsWith wrap)
             `for` tuple ( string, string )
         , claim "It contains the original string"
-            `true` (\( string, wrap ) -> surround string wrap |> String.contains string)
+            `true` (\( string, wrap ) -> surround wrap string |> String.contains string)
             `for` tuple ( string, string )
         , claim "It does not have anythig else inside"
             `true` (\( string, wrap ) ->
-                        surround string wrap
+                        surround wrap string
                             |> String.length
                             |> (==) ((String.length string) + (2 * String.length wrap))
                    )
@@ -360,8 +360,14 @@ ellipsisClaims =
 unquoteClaims : Claim
 unquoteClaims =
     suite "unquote"
-        [ claim "Removes quotes from all strings"
-            `false` (unquote >> Regex.contains (Regex.regex "\""))
+        [ claim "Removes quotes the start and end of all strings"
+            `false` (\(string) ->
+                        let
+                            unquoted =
+                                unquote string
+                        in
+                            String.startsWith "\"" unquoted && String.endsWith "\"" unquoted
+                    )
             `for` string
         ]
 

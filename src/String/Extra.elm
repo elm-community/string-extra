@@ -18,6 +18,7 @@ module String.Extra
         , quote
         , unquote
         , surround
+        , unsurround
         , wrap
         , wrapWith
         , unindent
@@ -60,7 +61,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Formatting
 
-@docs clean, quote, unquote, surround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
+@docs clean, quote, unquote, surround, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
 
 ## Converting Lists
 
@@ -271,12 +272,32 @@ classify string =
 
 {-| Surrounds a string with another string.
 
-   surround "foo" "bar" == "barfoobar"
+   surround "bar" "foo" == "barfoobar"
 
 -}
 surround : String -> String -> String
-surround string wrap =
+surround wrap string =
     wrap ++ string ++ wrap
+
+
+{-| Removes surrounding strings from another string.
+
+   unsurround "foo" "foobarfoo" == "bar"
+
+-}
+unsurround : String -> String -> String
+unsurround wrap string =
+    if String.startsWith wrap string && String.endsWith wrap string
+    then
+        let
+            length =
+                String.length wrap
+        in
+            string
+                |> String.dropLeft length
+                |> String.dropRight length
+    else
+        string
 
 
 {-| Adds quotes to a string.
@@ -286,17 +307,18 @@ surround string wrap =
 -}
 quote : String -> String
 quote string =
-    surround string "\""
+    surround "\"" string
 
 
-{-| Removes quotes from a string.
+{-| Removes quotes that surround a string.
 
    unquote "\"foo\"" == "foo"
+   unquote "\"foo\"bar\""
 
 -}
 unquote : String -> String
 unquote string =
-    replace "\"" "" string
+    unsurround "\"" string
 
 
 {-| Returns a string joined by underscores after separating it by its uppercase characters.
