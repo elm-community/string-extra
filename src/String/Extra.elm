@@ -21,6 +21,8 @@ module String.Extra
         , unsurround
         , wrap
         , wrapWith
+        , softWrap
+        , softWrapWith
         , unindent
         , countOccurrences
         , ellipsis
@@ -53,7 +55,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Wrapping
 
-@docs wrap, wrapWith
+@docs wrap, wrapWith, softWrap, softWrapWith, quote, surround
 
 ## Checks
 
@@ -61,7 +63,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Formatting
 
-@docs clean, quote, unquote, surround, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
+@docs clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
 
 ## Converting Lists
 
@@ -287,8 +289,7 @@ surround wrap string =
 -}
 unsurround : String -> String -> String
 unsurround wrap string =
-    if String.startsWith wrap string && String.endsWith wrap string
-    then
+    if String.startsWith wrap string && String.endsWith wrap string then
         let
             length =
                 String.length wrap
@@ -382,6 +383,34 @@ new line.
 wrap : Int -> String -> String
 wrap width string =
     wrapWith width "\n" string
+
+
+{-| Chops a given string into parts of a given width without breaking works apart,
+and then seperating them using a new line.
+
+    softWrap 7 "My very long text" === "My very\nlong text"
+    softWrap 3 "Hello World" === "Hello \nWorld"
+    softWrap 100 "Too short" === "Too short"
+
+-}
+softWrap : Int -> String -> String
+softWrap width string =
+    softWrapWith width "\n" string
+
+
+{-| Chops a given string into parts of a given width without breaking works apart,
+and then seperating them using the given separator.
+
+    softWrapWith 7 "..." "My very long text" === "My very...long text"
+    softWrapWith 3 "\n" Hello World" === "Hello \nWorld"
+    softWrapWith 100 "\t" "Too short" === "Too short"
+
+-}
+softWrapWith : Int -> String -> String -> String
+softWrapWith width separator string =
+    string
+        |> softBreak width
+        |> String.join separator
 
 
 {-| Converts an underscored, camelized, or dasherized string into one that can be read by humans.
