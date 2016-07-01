@@ -31,6 +31,7 @@ module String.Extra
         , toSentence
         , toSentenceOxford
         , stripTags
+        , rightOf
         )
 
 {-| Additional functions for working with Strings
@@ -68,6 +69,10 @@ Functions borrowed from the Rails Inflector class
 ## Converting Lists
 
 @docs toSentence, toSentenceOxford
+
+## Finding
+
+@docs rightOf
 
 -}
 
@@ -633,3 +638,16 @@ stripTags : String -> String
 stripTags string =
     string
         |> Regex.replace All (regex "<\\/?[^>]+>") (always "")
+
+
+{-| Searches a string from left to right for a pattern and returns a substring
+consisting of the characters in the string that are to the right of the pattern.
+
+    rightOf "_" "This_is_a_test_string" == "is_a_test_string"
+-}
+rightOf : String -> String -> String
+rightOf pattern string =
+    string
+        |> Regex.find (AtMost 1) (regex <| (escape pattern) ++ "(.*)$")
+        |> List.map (.submatches >> List.map (Maybe.withDefault "") >> String.join "")
+        |> String.join ""
