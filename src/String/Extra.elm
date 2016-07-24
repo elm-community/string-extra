@@ -32,6 +32,7 @@ module String.Extra
         , toSentenceOxford
         , stripTags
         , rightOf
+        , leftOf
         )
 
 {-| Additional functions for working with Strings
@@ -72,7 +73,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Finding
 
-@docs rightOf
+@docs rightOf, leftOf
 
 -}
 
@@ -649,5 +650,18 @@ rightOf : String -> String -> String
 rightOf pattern string =
     string
         |> Regex.find (AtMost 1) (regex <| (escape pattern) ++ "(.*)$")
-        |> List.map (.submatches >> List.map (Maybe.withDefault "") >> String.join "")
+        |> List.map (.submatches >> Maybe.oneOf >> Maybe.withDefault "")
+        |> String.join ""
+
+
+{-| Searches a string from left to right for a pattern and returns a substring
+consisting of the characters in the string that are to the left of the pattern.
+
+    lefttOf "_" "This_is_a_test_string" == "This"
+-}
+leftOf : String -> String -> String
+leftOf pattern string =
+    string
+        |> Regex.find (AtMost 1) (regex <| "^(.*?)" ++ (escape pattern))
+        |> List.map (.submatches >> Maybe.oneOf >> Maybe.withDefault "")
         |> String.join ""
