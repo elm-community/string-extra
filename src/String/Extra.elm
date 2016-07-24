@@ -33,6 +33,8 @@ module String.Extra
         , stripTags
         , rightOf
         , leftOf
+        , rightOfBack
+        , leftOfBack
         )
 
 {-| Additional functions for working with Strings
@@ -73,7 +75,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Finding
 
-@docs rightOf, leftOf
+@docs rightOf, leftOf, rightOfBack, leftOfBack
 
 -}
 
@@ -665,3 +667,33 @@ leftOf pattern string =
         |> Regex.find (AtMost 1) (regex <| "^(.*?)" ++ (escape pattern))
         |> List.map (.submatches >> Maybe.oneOf >> Maybe.withDefault "")
         |> String.join ""
+
+
+{-| Searches a string from right to left for a pattern and returns a substring
+consisting of the characters in the string that are to the right of the pattern.
+
+    rightOfBack "_" "This_is_a_test_string" == "string"
+-}
+rightOfBack : String -> String -> String
+rightOfBack pattern string =
+    string
+        |> String.indexes pattern
+        |> List.reverse
+        |> List.head
+        |> Maybe.map ((+) (String.length pattern) >> flip String.dropLeft string)
+        |> Maybe.withDefault ""
+
+
+{-| Searches a string from right to left for a pattern and returns a substring
+consisting of the characters in the string that are to the right of the pattern.
+
+    leftOfBack "_" "This_is_a_test_string" == "This_is_a_test"
+-}
+leftOfBack : String -> String -> String
+leftOfBack pattern string =
+    string
+        |> String.indexes pattern
+        |> List.reverse
+        |> List.head
+        |> Maybe.map (flip String.left string)
+        |> Maybe.withDefault ""
