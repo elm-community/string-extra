@@ -233,10 +233,10 @@ clean string =
 
 {-| Tests if a string is empty or only contains whitespace
 
-   isBlank "" == True
-   isBlank "\n" == True
-   isBlank "  " == True
-   isBlank " a" == False
+    isBlank "" == True
+    isBlank "\n" == True
+    isBlank "  " == True
+    isBlank " a" == False
 
 -}
 isBlank : String -> Bool
@@ -267,8 +267,8 @@ camelize string =
 {-| Converts string to camelized string starting with an uppercase.
 All non word characters will be stripped out of the original string.
 
-   classify "some_class_name" == "SomeClassName"
-   classify "myLittleCamel.class.name" == "MyLittleCamelClassName"
+    classify "some_class_name" == "SomeClassName"
+    classify "myLittleCamel.class.name" == "MyLittleCamelClassName"
 
 -}
 classify : String -> String
@@ -282,7 +282,7 @@ classify string =
 
 {-| Surrounds a string with another string.
 
-   surround "bar" "foo" == "barfoobar"
+    surround "bar" "foo" == "barfoobar"
 
 -}
 surround : String -> String -> String
@@ -292,7 +292,7 @@ surround wrap string =
 
 {-| Removes surrounding strings from another string.
 
-   unsurround "foo" "foobarfoo" == "bar"
+    unsurround "foo" "foobarfoo" == "bar"
 
 -}
 unsurround : String -> String -> String
@@ -311,7 +311,7 @@ unsurround wrap string =
 
 {-| Adds quotes to a string.
 
-   quote "foo" == "\"barfoobar\""
+    quote "foo" == "\"barfoobar\""
 
 -}
 quote : String -> String
@@ -321,8 +321,8 @@ quote string =
 
 {-| Removes quotes that surround a string.
 
-   unquote "\"foo\"" == "foo"
-   unquote "\"foo\"bar\""
+    unquote "\"foo\"" == "foo"
+    unquote "\"foo\"bar\""
 
 -}
 unquote : String -> String
@@ -334,9 +334,9 @@ unquote string =
 Any sequence of spaces or dashes will also be converted to a single underscore.
 The final string will be lowercased
 
-   underscore "SomeClassName" == "some_class_name"
-   underscore "some-class-name" == "some_class_name"
-   underscore "SomeClass name" == "some_class_name
+    underscore "SomeClassName" == "some_class_name"
+    underscore "some-class-name" == "some_class_name"
+    underscore "SomeClass name" == "some_class_name
 
 -}
 underscored : String -> String
@@ -352,9 +352,9 @@ underscored string =
 Any sequence of spaces or underscored will also be converted to a single dash.
 The final string will be lowercased
 
-   dasherize "SomeClassName" == "-some-class-name"
-   dasherize "some_class_name" = "some-class-name"
-   dasherize "someClass name" = "some-class-name"
+    dasherize "SomeClassName" == "-some-class-name"
+    dasherize "some_class_name" = "some-class-name"
+    dasherize "someClass name" = "some-class-name"
 
 -}
 dasherize : String -> String
@@ -425,10 +425,10 @@ softWrapWith width separator string =
 Also removes beginning and ending whitespace, and removes the postfix '_id'.
 The first character will be capitalized
 
-   humanize "this_is_great" == "This is great"
-   humanize "ThisIsGreat" = "This is great"
-   humanize "this-is-great" = "This is great"
-   humanize "author_id" = "Author"
+    humanize "this_is_great" == "This is great"
+    humanize "ThisIsGreat" = "This is great"
+    humanize "this-is-great" = "This is great"
+    humanize "author_id" = "Author"
 
 -}
 humanize : String -> String
@@ -489,8 +489,8 @@ unindent multilineSting =
 
 {-| Returns the number of occurrences of a substring in another string
 
-   countOccurrences "Hello" "Hello World" == 1
-   countOccurrences "o" "Hello World" == 2
+    countOccurrences "Hello" "Hello World" == 1
+    countOccurrences "o" "Hello World" == 2
 -}
 countOccurrences : String -> String -> Int
 countOccurrences needle haystack =
@@ -508,10 +508,10 @@ string have exactly the desired lenght.
 
 The resulting string will have at most the specified lenght
 
-   ellipsisWith 5 " .." "Hello World" == "Hello .."
-   ellipsisWith 10 " .."  "Hello World" == "Hello W..."
-   ellipsisWith 10 " .." "Hello" == "Hello"
-   ellipsisWith 8 " .." "Hello World" == "Hello World"
+    ellipsisWith 5 " .." "Hello World" == "Hello .."
+    ellipsisWith 10 " .."  "Hello World" == "Hello W..."
+    ellipsisWith 10 " .." "Hello" == "Hello"
+    ellipsisWith 8 " .." "Hello World" == "Hello World"
 
 -}
 ellipsisWith : Int -> String -> String -> String
@@ -528,10 +528,10 @@ the desired lenght.
 
 The resulting string will have at most the specified lenght
 
-   ellipsis 5 "Hello World" == "Hello..."
-   ellipsis 10 "Hello World" == "Hello W..."
-   ellipsis 10 "Hello" == "Hello"
-   ellipsis 8 "Hello World" == "Hello World"
+    ellipsis 5 "Hello World" == "Hello..."
+    ellipsis 10 "Hello World" == "Hello W..."
+    ellipsis 10 "Hello" == "Hello"
+    ellipsis 8 "Hello World" == "Hello World"
 
 -}
 ellipsis : Int -> String -> String
@@ -553,10 +553,10 @@ at the end of the truncated string.
 The resulting stirng can in some cases exceed the specifed lenght, by at most
 three characters.
 
-   softEllipsis 5 "Hello, World" == "Hello..."
-   softEllipsis 8 "Hello, World" == "Hello..."
-   softEllipsis 15 "Hello, cruel world" == "Hello, cruel..."
-   softEllipsis 10 "Hello" == "Hello"
+    softEllipsis 5 "Hello, World" == "Hello..."
+    softEllipsis 8 "Hello, World" == "Hello..."
+    softEllipsis 15 "Hello, cruel world" == "Hello, cruel..."
+    softEllipsis 10 "Hello" == "Hello"
 
 -}
 softEllipsis : Int -> String -> String
@@ -573,6 +573,7 @@ softEllipsis howLong string =
 
 
 {-| Converts a list of strings into a human formatted readable list
+
     toSentence [] == ""
     toSentence ["lions"] == "lions"
     toSentence ["lions", "tigers"] == "lions and tigers"
@@ -590,10 +591,11 @@ toSentence list =
 
 
 {-| Converts a list of strings into a human formatted readable list using an oxford comma
-    toSentence [] == ""
-    toSentence ["lions"] == "lions"
-    toSentence ["lions", "tigers"] == "lions and tigers"
-    toSentence ["lions", "tigers", "bears"] == "lions, tigers, and bears"
+
+    toSentenceOxford [] == ""
+    toSentenceOxford ["lions"] == "lions"
+    toSentenceOxford ["lions", "tigers"] == "lions and tigers"
+    toSentenceOxford ["lions", "tigers", "bears"] == "lions, tigers, and bears"
 
 -}
 toSentenceOxford : List String -> String
@@ -633,6 +635,7 @@ toSentenceHelper lastPart sentence list =
 
 
 {-| Removes all HTML tags from the string, preserving the text inside them.
+
     stripTags "a <a href=\"#\">link</a>" == "a link"
     stripTags "<script>alert('hello world!')</script> == "alert('hello world!')"
 
@@ -659,7 +662,7 @@ rightOf pattern string =
 {-| Searches a string from left to right for a pattern and returns a substring
 consisting of the characters in the string that are to the left of the pattern.
 
-    lefttOf "_" "This_is_a_test_string" == "This"
+    leftOf "_" "This_is_a_test_string" == "This"
 -}
 leftOf : String -> String -> String
 leftOf pattern string =
