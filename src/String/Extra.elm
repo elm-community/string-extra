@@ -343,8 +343,8 @@ underscored : String -> String
 underscored string =
     string
         |> String.trim
-        |> Regex.replace All (regex "([a-z\\d])([A-Z]+)") (.submatches >> List.map (Maybe.withDefault "") >> String.join "_")
-        |> Regex.replace All (regex "[-\\s]+") (always "_")
+        |> Regex.replace All (regex "([a-z\\d])([A-Z]+)") (.submatches >> List.filterMap identity >> String.join "_")
+        |> Regex.replace All (regex "[_-\\s]+") (always "_")
         |> String.toLower
 
 
@@ -410,7 +410,7 @@ softWrap width string =
 and then seperating them using the given separator.
 
     softWrapWith 7 "..." "My very long text" === "My very...long text"
-    softWrapWith 3 "\n" Hello World" === "Hello \nWorld"
+    softWrapWith 3 "\n" "Hello World" === "Hello \nWorld"
     softWrapWith 100 "\t" "Too short" === "Too short"
 
 -}

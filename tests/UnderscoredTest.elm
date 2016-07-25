@@ -17,7 +17,7 @@ underscoredClaims =
             `for` string
         , claim "It replaces spaces and dashes with an underscore"
             `that` (String.toLower >> underscored)
-            `is` (String.toLower >> String.trim >> replace "  " " " >> replace " " "-" >> replace "-" "_")
+            `is` (String.toLower >> String.trim >> replace "  " " " >> replace " " "-" >> replace "-" "_" >> replace "__" "_")
             `for` string
         , claim "It puts an underscore before each uppercase characters group unless it starts with uppercase"
             `that` (underscored)

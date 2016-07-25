@@ -77,37 +77,44 @@ replaceSliceClaims : Claim
 replaceSliceClaims =
     suite "replace"
         [ claim "Result contains the substitution string"
-            `true` (\( string, sub, start, end ) ->
-                        replaceSlice sub start end string |> String.contains sub
-                   )
+            `true`
+                (\( string, sub, start, end ) ->
+                    replaceSlice sub start end string |> String.contains sub
+                )
             `for` replaceSliceProducer
         , claim "Result string has the length of the substitution + string after removing the slice"
-            `that` (\( string, sub, start, end ) ->
-                        replaceSlice sub start end string |> String.length
-                   )
-            `is` (\( string, sub, start, end ) ->
+            `that`
+                (\( string, sub, start, end ) ->
+                    replaceSlice sub start end string |> String.length
+                )
+            `is`
+                (\( string, sub, start, end ) ->
                     (String.length string - (end - start)) + (String.length sub)
-                 )
+                )
             `for` replaceSliceProducer
         , claim "Start of the original string remains the same"
-            `that` (\( string, sub, start, end ) ->
-                        replaceSlice sub start end string |> String.slice 0 start
-                   )
-            `is` (\( string, _, start, _ ) ->
+            `that`
+                (\( string, sub, start, end ) ->
+                    replaceSlice sub start end string |> String.slice 0 start
+                )
+            `is`
+                (\( string, _, start, _ ) ->
                     String.slice 0 start string
-                 )
+                )
             `for` replaceSliceProducer
         , claim "End of the original string remains the same"
-            `that` (\( string, sub, start, end ) ->
-                        let
-                            replaced =
-                                replaceSlice sub start end string
-                        in
-                            replaced |> String.slice (start + (String.length sub)) (String.length replaced)
-                   )
-            `is` (\( string, _, _, end ) ->
+            `that`
+                (\( string, sub, start, end ) ->
+                    let
+                        replaced =
+                            replaceSlice sub start end string
+                    in
+                        replaced |> String.slice (start + (String.length sub)) (String.length replaced)
+                )
+            `is`
+                (\( string, _, _, end ) ->
                     String.slice end (String.length string) string
-                 )
+                )
             `for` replaceSliceProducer
         ]
 
@@ -128,7 +135,8 @@ breakClaims =
     suite "break"
         [ claim "The list should have as many elements as the ceil division of the length"
             `that` (\( string, width ) -> break width string |> List.length)
-            `is` (\( string, width ) ->
+            `is`
+                (\( string, width ) ->
                     let
                         b =
                             toFloat (String.length string)
@@ -137,19 +145,20 @@ breakClaims =
                             ceiling (b / (toFloat width))
                     in
                         clamp 1 10 r
-                 )
+                )
             `for` tuple ( string, (rangeInt 1 10) )
         , claim "Concatenating the result yields the original string"
             `that` (\( string, width ) -> break width string |> String.concat)
             `is` (\( string, _ ) -> string)
             `for` tuple ( string, (rangeInt 1 10) )
         , claim "No element in the list should have more than `width` chars"
-            `true` (\( string, width ) ->
-                        break width string
-                            |> List.map (String.length)
-                            |> List.filter ((<) width)
-                            |> List.isEmpty
-                   )
+            `true`
+                (\( string, width ) ->
+                    break width string
+                        |> List.map (String.length)
+                        |> List.filter ((<) width)
+                        |> List.isEmpty
+                )
             `for` tuple ( string, (rangeInt 1 10) )
         ]
 
@@ -162,26 +171,18 @@ softBreakClaims =
             `is` (\( string, _ ) -> string)
             `for` tuple ( string, (rangeInt 1 10) )
         , claim "The list should not have more elements than words"
-            `true` (\( string, width ) ->
-                        let
-                            broken =
-                                softBreak width string |> List.length
+            `true`
+                (\( string, width ) ->
+                    let
+                        broken =
+                            softBreak width string |> List.length
 
-                            words =
-                                String.words string |> List.length
-                        in
-                            broken <= words
-                   )
+                        words =
+                            String.words string |> List.length
+                    in
+                        broken <= words
+                )
             `for` tuple ( string, (rangeInt 1 10) )
-        , claim "Elements in the list with trailing spaces should be of maximum width"
-            `true` (\( string, width ) ->
-                        softBreak width string
-                            |> List.filter (\a -> (String.trim a) /= a)
-                            |> List.map (String.length)
-                            |> List.filter ((<) width)
-                            |> List.isEmpty
-                   )
-            `for` tuple ( string, (rangeInt 2 10) )
         ]
 
 
@@ -205,39 +206,46 @@ insertAtClaims : Claim
 insertAtClaims =
     suite "insertAt"
         [ claim "Result contains the substitution string"
-            `true` (\( sub, at, string ) ->
-                        string
-                            |> insertAt sub at
-                            |> String.contains sub
-                   )
+            `true`
+                (\( sub, at, string ) ->
+                    string
+                        |> insertAt sub at
+                        |> String.contains sub
+                )
             `for` insertAtProducer
         , claim "Resulting string has length as the sum of both arguments"
-            `that` (\( sub, at, string ) ->
-                        (String.length sub) + (String.length string)
-                   )
-            `is` (\( sub, at, string ) ->
+            `that`
+                (\( sub, at, string ) ->
+                    (String.length sub) + (String.length string)
+                )
+            `is`
+                (\( sub, at, string ) ->
                     insertAt sub at string
                         |> String.length
-                 )
+                )
             `for` insertAtProducer
         , claim "Start of the string remains the same"
-            `that` (\( sub, at, string ) ->
-                        String.slice 0 at string
-                   )
-            `is` (\( sub, at, string ) ->
+            `that`
+                (\( sub, at, string ) ->
+                    String.slice 0 at string
+                )
+            `is`
+                (\( sub, at, string ) ->
                     insertAt sub at string
                         |> String.slice 0 at
-                 )
+                )
             `for` insertAtProducer
         , claim "End of the string remains the same"
-            `that` (\( sub, at, string ) ->
-                        String.slice at (String.length string) string
-                   )
-            `is` (\( sub, at, string ) ->
+            `that`
+                (\( sub, at, string ) ->
+                    String.slice at (String.length string) string
+                )
+            `is`
+                (\( sub, at, string ) ->
                     insertAt sub at string
                         |> String.slice (at + (String.length sub))
                             ((String.length string) + String.length sub)
-                 )
+                )
             `for` insertAtProducer
         ]
 
@@ -292,11 +300,12 @@ surroundClaims =
             `true` (\( string, wrap ) -> surround wrap string |> String.contains string)
             `for` tuple ( string, string )
         , claim "It does not have anythig else inside"
-            `true` (\( string, wrap ) ->
-                        surround wrap string
-                            |> String.length
-                            |> (==) ((String.length string) + (2 * String.length wrap))
-                   )
+            `true`
+                (\( string, wrap ) ->
+                    surround wrap string
+                        |> String.length
+                        |> (==) ((String.length string) + (2 * String.length wrap))
+                )
             `for` tuple ( string, string )
         ]
 
@@ -305,17 +314,19 @@ countOccurrencesClaims : Claim
 countOccurrencesClaims =
     suite "countOccurrences"
         [ claim "Removing the occurrences should yield the right length"
-            `true` (\( needle, haystack ) ->
-                        let
-                            replacedLength =
-                                replace needle "" haystack |> String.length
+            `true`
+                (\( needle, haystack ) ->
+                    let
+                        replacedLength =
+                            replace needle "" haystack |> String.length
 
-                            times =
-                                countOccurrences needle haystack
-                        in
-                            replacedLength == (String.length haystack - (times * (String.length needle)))
-                   )
-            `for` filter (\( needle, haystack ) -> String.contains needle haystack)
+                        times =
+                            countOccurrences needle haystack
+                    in
+                        replacedLength == (String.length haystack - (times * (String.length needle)))
+                )
+            `for`
+                filter (\( needle, haystack ) -> String.contains needle haystack)
                     (tuple ( string, string ))
         ]
 
@@ -324,36 +335,43 @@ ellipsisClaims : Claim
 ellipsisClaims =
     suite "ellipsis"
         [ claim "The resulting string lenght does not exceed the specified length"
-            `true` (\( howLong, string ) ->
-                      ellipsis howLong string
+            `true`
+                (\( howLong, string ) ->
+                    ellipsis howLong string
                         |> String.length
                         |> (>=) howLong
-                   )
+                )
             `for` (tuple ( rangeInt 3 20, string ))
         , claim "The resulting string contains three dots and the end if necessary"
-            `true` (\( howLong, string ) ->
-                      ellipsis howLong string
+            `true`
+                (\( howLong, string ) ->
+                    ellipsis howLong string
                         |> String.endsWith "..."
-                   )
-            `for` filter
-              (\( howLong, string ) -> String.length string >= howLong + 3)
-              (tuple ( rangeInt 0 20, string ))
+                )
+            `for`
+                filter
+                    (\( howLong, string ) -> String.length string >= howLong + 3)
+                    (tuple ( rangeInt 0 20, string ))
         , claim "It starts with the left of the original string"
-            `true` (\( howLong, string ) ->
-                      string
+            `true`
+                (\( howLong, string ) ->
+                    string
                         |> String.startsWith (ellipsis howLong string |> String.dropRight 3)
-                   )
-            `for` filter
-              (\( howLong, string ) -> String.length string >= howLong + 3)
-              (tuple ( rangeInt 0 20, string ))
+                )
+            `for`
+                filter
+                    (\( howLong, string ) -> String.length string >= howLong + 3)
+                    (tuple ( rangeInt 0 20, string ))
         , claim "The resulting string does not contain three dots if it is short enough"
-            `false` (\( howLong, string ) ->
-                      ellipsis howLong string
+            `false`
+                (\( howLong, string ) ->
+                    ellipsis howLong string
                         |> String.endsWith "..."
-                    )
-            `for` filter
-              (\( howLong, string ) -> String.length string <= howLong)
-              (tuple ( rangeInt 0 20, string ))
+                )
+            `for`
+                filter
+                    (\( howLong, string ) -> String.length string <= howLong)
+                    (tuple ( rangeInt 0 20, string ))
         ]
 
 
@@ -361,13 +379,14 @@ unquoteClaims : Claim
 unquoteClaims =
     suite "unquote"
         [ claim "Removes quotes the start and end of all strings"
-            `false` (\(string) ->
-                        let
-                            unquoted =
-                                unquote string
-                        in
-                            String.startsWith "\"" unquoted && String.endsWith "\"" unquoted
-                    )
+            `false`
+                (\string ->
+                    let
+                        unquoted =
+                            unquote string
+                    in
+                        String.startsWith "\"" unquoted && String.endsWith "\"" unquoted
+                )
             `for` string
         ]
 
@@ -376,21 +395,24 @@ wrapClaims : Claim
 wrapClaims =
     suite "wrap"
         [ claim "Wraps given string at the requested length"
-            `true` (\(howLong, string) ->
-                      wrap howLong string
+            `true`
+                (\( howLong, string ) ->
+                    wrap howLong string
                         |> String.split "\n"
                         |> List.map (\str -> String.length str <= howLong)
                         |> List.all ((==) True)
-                   )
-            `for` tuple (rangeInt 1 20, string)
+                )
+            `for` tuple ( rangeInt 1 20, string )
         , claim "Does not wrap strings that are shorter than the requested length"
-            `false` (\(howLong, string) ->
-                      wrap howLong string
+            `false`
+                (\( howLong, string ) ->
+                    wrap howLong string
                         |> String.contains "\n"
-                    )
-            `for` filter
-              (\(howLong, string) -> String.length string <= howLong)
-              (tuple (rangeInt 1 20, string))
+                )
+            `for`
+                filter
+                    (\( howLong, string ) -> String.length string <= howLong)
+                    (tuple ( rangeInt 1 20, string ))
         ]
 
 

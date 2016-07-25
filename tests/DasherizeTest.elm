@@ -17,7 +17,7 @@ dasherizeClaims =
             `for` string
         , claim "It replaces spaces and underscores with a dash"
             `that` (String.toLower >> dasherize)
-            `is` (String.toLower >> String.trim >> replace "  " " " >> replace " " "-" >> replace "_" "-")
+            `is` (String.toLower >> String.trim >> replace "  " " " >> replace " " "-" >> replace "_" "-" >> replace "--" "-")
             `for` string
         , claim "It puts dash before every single uppercase character"
             `that` (dasherize)
