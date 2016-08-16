@@ -8,6 +8,4 @@ install:
   - cd tests
   - elm-package install -y
 
-script:
-  - cd tests
-  - elm-test TestRunner.elm
+script: elm-test TestRunner.elm
