@@ -131,11 +131,13 @@ replaceTest =
             \string substitute ->
                 replace string substitute string
                     |> Expect.equal substitute
+
         , fuzz string "It substitutes multiple occurances" <|
             \string ->
                 replace "a" "b" string
                     |> String.contains "a"
                     |> Expect.false "Given string should not contain any 'a'"
+
         , test "It should replace special characters" <|
             \_ ->
                 replace "\\" "deepthought" "this is a special string \\"
@@ -255,23 +257,38 @@ replaceTest =
 --            `for` tuple ( string, (rangeInt 1 10) )
 --        ]
 --
---
---cleanClaims : Claim
---cleanClaims =
---    suite "clean"
---        [ claim "The String.split result is the same as String.words"
---            `that` (clean >> String.split " ")
---            `is` (String.words)
---            `for` string
---        , claim "It trims the string on the left side"
---            `true` (not << String.startsWith " " << clean)
---            `for` string
---        , claim "It trims the string on the right side"
---            `true` (not << String.endsWith " " << clean)
---            `for` string
---        ]
---
---
+
+cleanTest : Test
+cleanTest =
+    describe "clean"
+        [ fuzz string "The String.split result is the same as String.words" <|
+            \string ->
+                let 
+                    result =
+                        string 
+                            |> clean 
+                            |> String.split " "
+                    
+                    expected =
+                        String.words string
+                in
+                    Expect.equal expected result
+
+        , fuzz string "It trims the string on the left side" <|
+            \string ->
+                string
+                    |> clean
+                    |> String.startsWith " "
+                    |> Expect.false "Did not trim the start of the string"
+
+        , fuzz string "It trims the string on the right side" <|
+            \string ->
+                string
+                    |> clean
+                    |> String.endsWith " "
+                    |> Expect.false "Did not trim the end of the string"
+        ]
+
 --insertAtClaims : Claim
 --insertAtClaims =
 --    suite "insertAt"
@@ -329,17 +346,22 @@ replaceTest =
 --        )
 --        (tuple3 ( string, (rangeInt 0 10), string ))
 --
---
---isBlankClaims : Claim
---isBlankClaims =
---    suite "isBlank"
---        [ claim "Returns false if there are non whitespace characters"
---            `that` (isBlank)
---            `is` (Regex.contains (Regex.regex "^\\s*$"))
---            `for` string
---        ]
---
---
+
+isBlankTest : Test
+isBlankTest =
+    describe "isBlank"
+        [ test "Returns true if the given string is blank" <|
+            \_ ->
+                isBlank ""
+                    |> Expect.true "Did not return true"
+
+        , test "Returns false if the given string is not blank" <|
+            \_ ->
+                isBlank " Slartibartfast"
+                    |> Expect.false "Did not return false"
+        ]
+
+
 --classifyClaims : Claim
 --classifyClaims =
 --    suite "classify"
@@ -496,9 +518,9 @@ all =
         --, replaceSliceClaims
         --, breakClaims
         --, softBreakClaims
-        --, cleanClaims
+        , cleanTest
         --, insertAtClaims
-        --, isBlankClaims
+        , isBlankTest
         --, camelizeClaims
         --, classifyClaims
         --, surroundClaims
