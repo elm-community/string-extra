@@ -3,11 +3,11 @@ language: node_js
   - "4.3"
 
 install:
-  - npm install -g elm
+  - npm install -g elm elm-test
+  - elm-package install -y
+  - cd tests
   - elm-package install -y
 
-before_script:
-    - cd tests
-    - elm-make Test.elm --yes --output test.js
-
-script: node test.js
+script:
+  - cd tests
+  - elm-test TestRunner.elm
