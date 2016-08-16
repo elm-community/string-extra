@@ -1,6 +1,8 @@
 sudo: false
 language: node_js
-  - "4.3"
+
+node_js:
+  - "node"
 
 install:
   - npm install -g elm elm-test
