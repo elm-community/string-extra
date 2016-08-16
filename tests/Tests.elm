@@ -1,7 +1,7 @@
 module Tests exposing (..)
 
 import String.Extra exposing (..)
-import String exposing (uncons, fromChar, toUpper)
+import String exposing (uncons, fromChar, toUpper, toLower)
 import Regex
 import Test exposing (..)
 import Fuzz exposing (..)
@@ -11,6 +11,11 @@ import Expect
 --import DasherizeTest exposing (dasherizeClaims)
 --import HumanizeTest exposing (humanizeClaims)
 --import UnindentTest exposing (unindentClaims)
+
+
+tail : String -> String
+tail =
+    uncons >> Maybe.map snd >> Maybe.withDefault ""
 
 
 toSentenceCaseTest : Test
@@ -37,9 +42,6 @@ toSentenceCaseTest =
         , fuzz string "The tail of the string remains untouched" <|
             \string ->
                 let
-                    tail =
-                        (uncons >> Maybe.map snd >> Maybe.withDefault "")
-
                     result =
                         (toSentenceCase >> tail) string
 
@@ -49,52 +51,99 @@ toSentenceCaseTest =
                     Expect.equal expected result
         ]
 
---
---decapitalizeClaims : Claim
---decapitalizeClaims =
---    suite "decapitalize"
---        [ claim "It only converts to lowercase the first char in the string"
---            `that` (decapitalize >> uncons >> Maybe.map (fst >> fromChar) >> Maybe.withDefault "")
---            `is` (uncons >> Maybe.map (fst >> fromChar >> toLower) >> Maybe.withDefault "")
---            `for` string
---        , claim "The tail of the string remains untouched"
---            `that` (decapitalize >> uncons >> Maybe.map snd >> Maybe.withDefault "")
---            `is` (uncons >> Maybe.map snd >> Maybe.withDefault "")
---            `for` string
---        ]
---
---
---toTitleCaseClaims : Claim
---toTitleCaseClaims =
---    suite "toTitleCase"
---        [ claim "It converts the first letter of each word to uppercase"
---            `that` (String.join " " >> toTitleCase >> String.words)
---            `is` (String.join " " >> String.words >> List.map toSentenceCase)
---            `for` list string
---        , claim "It does not change the length of the string"
---            `that` (String.join " " >> toTitleCase >> String.length)
---            `is` (String.join " " >> String.length)
---            `for` list string
---        ]
---
---
---replaceClaims : Claim
---replaceClaims =
---    suite "replace"
---        [ claim "It substitutes all occurences of the same sequence"
---            `that` (\( string, substitute ) -> replace string substitute string)
---            `is` (\( string, substitute ) -> substitute)
---            `for` tuple ( string, string )
---        , claim "It substitutes multiple occurances"
---            `false` (\string -> replace "a" "b" string |> String.contains "a")
---            `for` filter (\arg -> String.contains "a" arg) string
---        , claim "It accepts special characters"
---            `true` (\string -> replace "\\" "bbbbb" string |> String.contains "bbbb")
---            `for` filter (\arg -> String.contains "\\" arg) string
---        ]
---
---
---replaceSliceClaims : Claim
+
+decapitalizeTest : Test
+decapitalizeTest =
+    describe "decapitalize"
+        [ fuzz string "It only converst the first char in the string to lowercase" <|
+            \string ->
+                let
+                    result =
+                        string
+                            |> decapitalize
+                            |> uncons
+                            |> Maybe.map (fst >> fromChar)
+                            |> Maybe.withDefault ""
+
+                    expected =
+                        string
+                            |> uncons
+                            |> Maybe.map (fst >> fromChar >> toLower)
+                            |> Maybe.withDefault ""
+                in
+                    Expect.equal expected result
+
+        , fuzz string "It does not change the tail of the string" <|
+            \string ->
+                let
+                    result =
+                        (decapitalize >> tail) string
+
+                    expected =
+                        tail string
+                in
+                    Expect.equal expected result
+        ]
+
+
+toTitleCaseTest : Test
+toTitleCaseTest =
+    describe "toTitleCase"
+        [ fuzz (list string) "It converts the first letter of each word to uppercase" <|
+            \strings ->
+                let
+                    result =
+                        strings
+                            |> String.join " "
+                            |> toTitleCase
+                            |> String.words
+
+                    expected =
+                        strings
+                            |> String.join " "
+                            |> String.words
+                            |> List.map toSentenceCase
+                in
+                    Expect.equal expected result
+
+        , fuzz (list string) "It does not change the length of the string" <|
+            \strings ->
+                let 
+                    result =
+                        strings
+                            |> String.join " "
+                            |> toTitleCase
+                            |> String.length
+
+                    expected =
+                        strings
+                            |> String.join " "
+                            |> String.length
+                in
+                    Expect.equal expected result
+        ]
+
+
+replaceTest : Test
+replaceTest =
+    describe "replace"
+        [ fuzz2 string string "It substitutes all occurences of the same sequence" <|
+            \string substitute ->
+                replace string substitute string
+                    |> Expect.equal substitute
+        , fuzz string "It substitutes multiple occurances" <|
+            \string ->
+                replace "a" "b" string
+                    |> String.contains "a"
+                    |> Expect.false "Given string should not contain any 'a'"
+        , test "It should replace special characters" <|
+            \_ ->
+                replace "\\" "deepthought" "this is a special string \\"
+                    |> String.contains "deepthought"
+                    |> Expect.true "String should contain deepthought"
+        ]
+
+
 --replaceSliceClaims =
 --    suite "replace"
 --        [ claim "Result contains the substitution string"
@@ -441,9 +490,9 @@ all : Test
 all =
     describe "String.Extra"
         [ toSentenceCaseTest
-        --, toTitleCaseClaims
-        --, decapitalizeClaims
-        --, replaceClaims
+        , decapitalizeTest
+        , toTitleCaseTest
+        , replaceTest
         --, replaceSliceClaims
         --, breakClaims
         --, softBreakClaims
