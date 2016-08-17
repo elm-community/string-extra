@@ -378,30 +378,43 @@ isBlankTest =
 --            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z\\s\\.\\-\\_]+$")) string
 --        ]
 --
---
---surroundClaims : Claim
---surroundClaims =
---    suite "surround"
---        [ claim "It starts with the wrapping string"
---            `true` (\( string, wrap ) -> surround wrap string |> String.startsWith wrap)
---            `for` tuple ( string, string )
---        , claim "It ends with the wrapping string"
---            `true` (\( string, wrap ) -> surround wrap string |> String.endsWith wrap)
---            `for` tuple ( string, string )
---        , claim "It contains the original string"
---            `true` (\( string, wrap ) -> surround wrap string |> String.contains string)
---            `for` tuple ( string, string )
---        , claim "It does not have anythig else inside"
---            `true`
---                (\( string, wrap ) ->
---                    surround wrap string
---                        |> String.length
---                        |> (==) ((String.length string) + (2 * String.length wrap))
---                )
---            `for` tuple ( string, string )
---        ]
---
---
+
+surroundTest : Test
+surroundTest =
+    describe "surround"
+        [ fuzz2 string string "It starts with the wrapping string" <|
+            \string wrap ->
+                string
+                    |> surround wrap
+                    |> String.startsWith wrap
+                    |> Expect.true "Did not start with the wrapping string"
+
+        , fuzz2 string string "It ends with the wrapping string" <|
+            \string wrap ->
+                string
+                    |> surround wrap
+                    |> String.endsWith wrap
+                    |> Expect.true "Did not end with the wrapping string"
+
+        , fuzz2 string string "It contains the original string" <|
+            \string wrap ->
+                string
+                    |> surround wrap
+                    |> String.contains string
+                    |> Expect.true "Did not contain the string"
+
+        , fuzz2 string string "It does not have anything else inside" <|
+            \string wrap ->
+                let
+                    result =
+                        String.length (surround wrap string)
+
+                    expected =
+                        (String.length string) + (2 * String.length wrap)
+                in
+                    Expect.equal expected result
+        ]
+
 --countOccurrencesClaims : Claim
 --countOccurrencesClaims =
 --    suite "countOccurrences"
@@ -523,7 +536,7 @@ all =
         , isBlankTest
         --, camelizeClaims
         --, classifyClaims
-        --, surroundClaims
+        , surroundTest
         --, underscoredClaims
         --, dasherizeClaims
         --, humanizeClaims
