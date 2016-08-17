@@ -415,27 +415,27 @@ surroundTest =
                     Expect.equal expected result
         ]
 
---countOccurrencesClaims : Claim
---countOccurrencesClaims =
---    suite "countOccurrences"
---        [ claim "Removing the occurrences should yield the right length"
---            `true`
---                (\( needle, haystack ) ->
---                    let
---                        replacedLength =
---                            replace needle "" haystack |> String.length
---
---                        times =
---                            countOccurrences needle haystack
---                    in
---                        replacedLength == (String.length haystack - (times * (String.length needle)))
---                )
---            `for`
---                filter (\( needle, haystack ) -> String.contains needle haystack)
---                    (tuple ( string, string ))
---        ]
---
---
+
+-- TODO: ensure this test only gets strings that contain the needle in the
+-- haystack?
+countOccurrencesTest : Test
+countOccurrencesTest =
+    describe "countOccurrences"
+        [ fuzz2 string string "Removing the occurences should yield the right length" <|
+            \needle haystack ->
+                let
+                    times =
+                        countOccurrences needle haystack
+
+                    result =
+                        String.length haystack - (times * (String.length needle))
+
+                    expected =
+                        String.length (replace needle "" haystack)
+                in
+                    Expect.equal expected result
+            ]
+
 --ellipsisClaims : Claim
 --ellipsisClaims =
 --    suite "ellipsis"
@@ -478,47 +478,34 @@ surroundTest =
 --                    (\( howLong, string ) -> String.length string <= howLong)
 --                    (tuple ( rangeInt 0 20, string ))
 --        ]
---
---
---unquoteClaims : Claim
---unquoteClaims =
---    suite "unquote"
---        [ claim "Removes quotes the start and end of all strings"
---            `false`
---                (\string ->
---                    let
---                        unquoted =
---                            unquote string
---                    in
---                        String.startsWith "\"" unquoted && String.endsWith "\"" unquoted
---                )
---            `for` string
---        ]
---
---
---wrapClaims : Claim
---wrapClaims =
---    suite "wrap"
---        [ claim "Wraps given string at the requested length"
---            `true`
---                (\( howLong, string ) ->
---                    wrap howLong string
---                        |> String.split "\n"
---                        |> List.map (\str -> String.length str <= howLong)
---                        |> List.all ((==) True)
---                )
---            `for` tuple ( rangeInt 1 20, string )
---        , claim "Does not wrap strings that are shorter than the requested length"
---            `false`
---                (\( howLong, string ) ->
---                    wrap howLong string
---                        |> String.contains "\n"
---                )
---            `for`
---                filter
---                    (\( howLong, string ) -> String.length string <= howLong)
---                    (tuple ( rangeInt 1 20, string ))
---        ]
+
+unquoteTest : Test
+unquoteTest =
+    describe "unquote"
+        [ test "Removes quotes from the start of the string" <|
+            \_ ->
+                unquote "\"Magrathea\""
+                    |> Expect.equal "Magrathea"
+        ]
+
+
+wrapTest : Test
+wrapTest =
+    describe "wrap"
+        [ fuzz2 (intRange 1 20) string "Wraps given string at the requested length" <|
+            \howLong string ->
+                wrap howLong string
+                    |> String.split "\n"
+                    |> List.map (\str -> String.length str <= howLong)
+                    |> List.all ((==) True)
+                    |> Expect.true "Given string was not wrapped at requested length"
+
+        , test "Does not wrap string shorter than the requested length" <|
+            \_ ->
+                wrap 50 "Heart of Gold"
+                    |> String.contains "\n"
+                    |> Expect.false "Short string was wrapped"
+        ]
 
 
 all : Test
@@ -541,8 +528,8 @@ all =
         --, dasherizeClaims
         --, humanizeClaims
         --, unindentClaims
-        --, countOccurrencesClaims
+        , countOccurrencesTest
         --, ellipsisClaims
-        --, unquoteClaims
-        --, wrapClaims
+        , unquoteTest
+        , wrapTest
         ]
