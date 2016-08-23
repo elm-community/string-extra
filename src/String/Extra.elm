@@ -35,8 +35,8 @@ module String.Extra
         , leftOf
         , rightOfBack
         , leftOfBack
-        , int
-        , float
+        , fromInt
+        , fromFloat
         )
 
 {-| Additional functions for working with Strings
@@ -81,7 +81,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Converting Numbers
 
-@docs int, float
+@docs fromInt, fromFloat
 
 -}
 
@@ -713,8 +713,8 @@ leftOfBack pattern string =
 This works the same way as `Basics.toString` except its type is restricted,
 so if you accidentally pass it something other than an Int, you get an error.
 -}
-int : Int -> String
-int =
+fromInt : Int -> String
+fromInt =
     toString
 
 
@@ -723,6 +723,6 @@ int =
 This works the same way as `Basics.toString` except its type is restricted,
 so if you accidentally pass it something other than a Float, you get an error.
 -}
-float : Float -> String
-float =
+fromFloat : Float -> String
+fromFloat =
     toString
