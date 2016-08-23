@@ -317,7 +317,7 @@ unsurround wrap string =
 
 {-| Adds quotes to a string.
 
-    quote "foo" == "\"barfoobar\""
+    quote "foo" == "\"foo\""
 
 -}
 quote : String -> String
