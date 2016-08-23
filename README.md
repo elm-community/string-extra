@@ -5,11 +5,6 @@ String helper functions for Elm, inspired by [underscore.string](http://epeli.gi
 
 [![Build Status](https://travis-ci.org/elm-community/string-extra.svg?branch=master)](https://travis-ci.org/elm-community/string-extra)
 
-Warning
--------
-
-`string-extra` is still in development, so everything can still change.
-
 Contributing
 ------------
 
