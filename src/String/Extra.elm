@@ -35,6 +35,8 @@ module String.Extra
         , leftOf
         , rightOfBack
         , leftOfBack
+        , fromInt
+        , fromFloat
         )
 
 {-| Additional functions for working with Strings
@@ -76,6 +78,10 @@ Functions borrowed from the Rails Inflector class
 ## Finding
 
 @docs rightOf, leftOf, rightOfBack, leftOfBack
+
+## Converting Numbers
+
+@docs fromInt, fromFloat
 
 -}
 
@@ -700,3 +706,23 @@ leftOfBack pattern string =
         |> List.head
         |> Maybe.map (flip String.left string)
         |> Maybe.withDefault ""
+
+
+{-| Turn an Int into a String.
+
+This works the same way as `Basics.toString` except its type is restricted,
+so if you accidentally pass it something other than an Int, you get an error.
+-}
+fromInt : Int -> String
+fromInt =
+    toString
+
+
+{-| Turns a Float into a String.
+
+This works the same way as `Basics.toString` except its type is restricted,
+so if you accidentally pass it something other than a Float, you get an error.
+-}
+fromFloat : Float -> String
+fromFloat =
+    toString
