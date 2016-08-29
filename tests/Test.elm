@@ -13,6 +13,7 @@ import UnderscoredTest exposing (underscoredClaims)
 import DasherizeTest exposing (dasherizeClaims)
 import HumanizeTest exposing (humanizeClaims)
 import UnindentTest exposing (unindentClaims)
+import UnicodeTest exposing (unicodeClaims)
 
 
 toSentenceCaseClaims : Claim
@@ -440,6 +441,7 @@ evidence =
         , ellipsisClaims
         , unquoteClaims
         , wrapClaims
+        , unicodeClaims
         ]
         |> quickCheck
 
