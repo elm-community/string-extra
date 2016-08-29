@@ -735,6 +735,15 @@ fromFloat =
     toString
 
 
+{-| Code point of Unicode character to use to indicate an 'unknown or
+unrepresentable character'
+(https://en.wikipedia.org/wiki/Specials_(Unicode_block))
+-}
+replacementCodePoint : Int
+replacementCodePoint =
+    0xFFFD
+
+
 {-| Converts a String into a list of UTF-32 code points.
 
     toCodePoints "abc" == [ 97, 98, 99 ]
@@ -786,8 +795,9 @@ toCodePoints string =
                         case afterFirst of
                             [] ->
                                 -- Should never happen - leading surrogate with
-                                -- no following code unit, discard it
-                                accumulated
+                                -- no following code unit, replace it with the
+                                -- replacement character
+                                replacementCodePoint :: accumulated
 
                             second :: afterSecond ->
                                 -- Good, there is a following code unit (which
@@ -807,13 +817,16 @@ toCodePoints string =
                                         combineAndReverse afterSecond
                                             (codePoint :: accumulated)
                                 else
-                                    -- Should never happen - second code unit is
-                                    -- not a valid trailing surrogate, skip the
-                                    -- leading surrogate and continue with
-                                    -- remaining code units (perhaps the second
-                                    -- code unit is a valid leading surrogate or
-                                    -- standalone character, so don't skip it)
-                                    combineAndReverse afterFirst accumulated
+                                    -- Should never happen - second code unit
+                                    -- is not a valid trailing surrogate,
+                                    -- replace the leading surrogate with the
+                                    -- replacement character and continue with
+                                    -- remaining code units (perhaps the
+                                    -- second code unit is a valid leading
+                                    -- surrogate or standalone character, so
+                                    -- don't skip it)
+                                    combineAndReverse afterFirst
+                                        (replacementCodePoint :: accumulated)
                     else if first >= 0xE000 && first <= 0xFFFF then
                         -- First code unit is in BMP (and is therefore a valid
                         -- UTF-32 code point), use it as is and continue with
@@ -821,8 +834,10 @@ toCodePoints string =
                         combineAndReverse afterFirst (first :: accumulated)
                     else
                         -- Should never happen - first code unit is invalid,
-                        -- skip it and continue with remaining code units
-                        combineAndReverse afterFirst accumulated
+                        -- replace it with the replacement character and
+                        -- continue with remaining code units
+                        combineAndReverse afterFirst
+                            (replacementCodePoint :: accumulated)
 
         allCodeUnits =
             List.map Char.toCode (String.toList string)
@@ -884,9 +899,11 @@ fromCodePoints allCodePoints =
                         -- and continue with remaining code points
                         splitAndReverse rest (codePoint :: accumulated)
                     else
-                        -- Should never happen - invalid code point, skip it and
-                        -- continue with remaining code points
-                        splitAndReverse rest accumulated
+                        -- Should never happen - invalid code point, replace
+                        -- it with the replacement character and continue with
+                        -- remaining code points
+                        splitAndReverse rest
+                            (replacementCodePoint :: accumulated)
 
         allCodeUnits =
             List.reverse (splitAndReverse allCodePoints [])
