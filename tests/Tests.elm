@@ -437,48 +437,47 @@ countOccurrencesTest =
                     Expect.equal expected result
             ]
 
---ellipsisClaims : Claim
---ellipsisClaims =
---    suite "ellipsis"
---        [ claim "The resulting string lenght does not exceed the specified length"
---            `true`
---                (\( howLong, string ) ->
---                    ellipsis howLong string
---                        |> String.length
---                        |> (>=) howLong
---                )
---            `for` (tuple ( rangeInt 3 20, string ))
---        , claim "The resulting string contains three dots and the end if necessary"
---            `true`
---                (\( howLong, string ) ->
---                    ellipsis howLong string
---                        |> String.endsWith "..."
---                )
---            `for`
---                filter
---                    (\( howLong, string ) -> String.length string >= howLong + 3)
---                    (tuple ( rangeInt 0 20, string ))
---        , claim "It starts with the left of the original string"
---            `true`
---                (\( howLong, string ) ->
---                    string
---                        |> String.startsWith (ellipsis howLong string |> String.dropRight 3)
---                )
---            `for`
---                filter
---                    (\( howLong, string ) -> String.length string >= howLong + 3)
---                    (tuple ( rangeInt 0 20, string ))
---        , claim "The resulting string does not contain three dots if it is short enough"
---            `false`
---                (\( howLong, string ) ->
---                    ellipsis howLong string
---                        |> String.endsWith "..."
---                )
---            `for`
---                filter
---                    (\( howLong, string ) -> String.length string <= howLong)
---                    (tuple ( rangeInt 0 20, string ))
---        ]
+
+ellipsisTest : Test
+ellipsisTest =
+    describe "ellipsis"
+        [ fuzz2 (intRange 3 20) string
+            "The resulting string length does not exceed the specified length" <|
+            \howLong string ->
+                ellipsis howLong string
+                    |> String.length
+                    |> (>=) howLong
+                    |> Expect.true "Resulting string exceeds specified length"
+
+        , fuzz2 (intRange 3 20) string
+            "The resulting string contains three dots at the end if necessary" <|
+            \howLong string ->
+                let
+                    result =
+                        ellipsis howLong string
+                in
+                    result
+                        |> String.endsWith "..."
+                        |> if String.length string > howLong then
+                               Expect.true "Should add ellipsis to this string"
+                           else
+                               Expect.false "Should not add ellipsis"
+
+        , fuzz2 (intRange 3 20) string
+            "It starts with the left of the original string" <|
+            \howLong string ->
+                let
+                    result =
+                        ellipsis howLong string
+
+                    resultLeft =
+                        String.dropRight 3 result
+                in
+                    string
+                        |> String.startsWith resultLeft
+                        |> Expect.true "Should start with the original left"
+        ]
+
 
 unquoteTest : Test
 unquoteTest =
@@ -530,7 +529,7 @@ all =
         --, humanizeClaims
         --, unindentClaims
         , countOccurrencesTest
-        --, ellipsisClaims
+        , ellipsisTest
         , unquoteTest
         , wrapTest
         , unicodeTests
