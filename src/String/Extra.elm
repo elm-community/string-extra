@@ -37,6 +37,8 @@ module String.Extra
         , leftOfBack
         , fromInt
         , fromFloat
+        , toCodePoints
+        , fromCodePoints
         )
 
 {-| Additional functions for working with Strings
@@ -83,6 +85,10 @@ Functions borrowed from the Rails Inflector class
 
 @docs fromInt, fromFloat
 
+## Converting UTF-32
+
+@docs toCodePoints, fromCodePoints
+
 -}
 
 import String exposing (uncons, cons, words, join)
@@ -90,6 +96,7 @@ import Char exposing (toUpper, toLower)
 import Regex exposing (regex, escape, HowMany(..))
 import Maybe exposing (Maybe(..))
 import List
+import Bitwise
 
 
 {-| Changes the case of the first letter of a string to either Uppercase of
@@ -726,3 +733,179 @@ so if you accidentally pass it something other than a Float, you get an error.
 fromFloat : Float -> String
 fromFloat =
     toString
+
+
+{-| Code point of Unicode character to use to indicate an 'unknown or
+unrepresentable character'
+(https://en.wikipedia.org/wiki/Specials_(Unicode_block))
+-}
+replacementCodePoint : Int
+replacementCodePoint =
+    0xFFFD
+
+
+{-| Converts a String into a list of UTF-32 code points.
+
+    toCodePoints "abc" == [ 97, 98, 99 ]
+    toCodePoints "©§π" == [ 169, 167, 960 ]
+
+If every character in the string can be represented by a single UTF-16 code
+unit, `toCodePoints` is equivalent to
+
+    String.toList >> List.map Char.toCode
+
+However, for characters that do not fit into a single UTF-16 code unit and
+have to be represented by a surrogate pair, the above will return each code
+unit in the surrogate pair separately:
+
+    -- 💩 is U+1F4A9 PILE OF POO
+    List.map Char.toCode (String.toList "💩!") == [ 55357, 56489, 33 ]
+
+`toCodePoints detects and combines surrogate pairs of code units to return a
+list of valid UTF-32 code points:
+
+    toCodePoints "💩!" == [ 128169, 33 ]
+
+Note that this still does not necessarily correspond to logical/visual
+characters, since it is possible for things like accented characters to be
+represented as two separate UTF-32 code points (a base character and a
+combining accent).
+-}
+toCodePoints : String -> List Int
+toCodePoints string =
+    let
+        -- Convert a list of UTF-16 code units to a reversed list of UTF-32 code
+        -- points (merging surrogate pairs into single code points where
+        -- necessary)
+        combineAndReverse codeUnits accumulated =
+            case codeUnits of
+                [] ->
+                    accumulated
+
+                first :: afterFirst ->
+                    -- We have at least one code unit - might be a code point
+                    -- itself, or the leading code unit of a surrogate pair
+                    if first >= 0 && first <= 0xD7FF then
+                        -- First code unit is in BMP (and is therefore a valid
+                        -- UTF-32 code point), use it as is and continue with
+                        -- remaining code units
+                        combineAndReverse afterFirst (first :: accumulated)
+                    else if first >= 0xD800 && first <= 0xDBFF then
+                        -- First code unit is a leading surrogate
+                        case afterFirst of
+                            [] ->
+                                -- Should never happen - leading surrogate with
+                                -- no following code unit, replace it with the
+                                -- replacement character
+                                replacementCodePoint :: accumulated
+
+                            second :: afterSecond ->
+                                -- Good, there is a following code unit (which
+                                -- should be a trailing surrogate)
+                                if second >= 0xDC00 && second <= 0xDFFF then
+                                    -- Second code unit is a valid trailing
+                                    -- surrogate
+                                    let
+                                        -- Reconstruct UTF-32 code point from
+                                        -- surrogate pair
+                                        codePoint =
+                                            0x00010000
+                                                + ((first - 0xD800) * 1024)
+                                                + (second - 0xDC00)
+                                    in
+                                        -- Continue with following code units
+                                        combineAndReverse afterSecond
+                                            (codePoint :: accumulated)
+                                else
+                                    -- Should never happen - second code unit
+                                    -- is not a valid trailing surrogate,
+                                    -- replace the leading surrogate with the
+                                    -- replacement character and continue with
+                                    -- remaining code units (perhaps the
+                                    -- second code unit is a valid leading
+                                    -- surrogate or standalone character, so
+                                    -- don't skip it)
+                                    combineAndReverse afterFirst
+                                        (replacementCodePoint :: accumulated)
+                    else if first >= 0xE000 && first <= 0xFFFF then
+                        -- First code unit is in BMP (and is therefore a valid
+                        -- UTF-32 code point), use it as is and continue with
+                        -- remaining code units
+                        combineAndReverse afterFirst (first :: accumulated)
+                    else
+                        -- Should never happen - first code unit is invalid,
+                        -- replace it with the replacement character and
+                        -- continue with remaining code units
+                        combineAndReverse afterFirst
+                            (replacementCodePoint :: accumulated)
+
+        allCodeUnits =
+            List.map Char.toCode (String.toList string)
+    in
+        List.reverse (combineAndReverse allCodeUnits [])
+
+
+{-| Converts a list of UTF-32 code points into a String. Inverse of
+`toCodePoints`.
+
+    fromCodePoints [ 97, 98, 99 ] == "abc"
+    fromCodePoints [ 169, 167, 960 ] == "©§π"
+
+If every code point is a valid UTF-16 code unit, `fromCodePoints` is equivalent
+to
+
+    List.map Char.fromCode >> String.fromList
+
+However, `fromCodePoints` additionally splits code points that do not fit in a
+single UTF-16 code unit into surrogate pairs, so that even code points outside
+the Basic Multilingual Plane (BMP) can be included in the resulting string:
+
+    -- Code point 128169 is 💩, U+1F4A9 PILE OF POO
+    fromCodePoints [ 128169, 33 ] == "💩!"
+-}
+fromCodePoints : List Int -> String
+fromCodePoints allCodePoints =
+    let
+        -- Convert a list of UTF-32 code points into a reversed list of UTF-16
+        -- code units (splitting single code points into surrogate pairs where
+        -- necessary)
+        splitAndReverse codePoints accumulated =
+            case codePoints of
+                [] ->
+                    accumulated
+
+                codePoint :: rest ->
+                    if codePoint >= 0 && codePoint <= 0xD7FF then
+                        -- Code point is valid UTF-16 code unit, use it as is
+                        -- and continue with remaining code points
+                        splitAndReverse rest (codePoint :: accumulated)
+                    else if codePoint >= 0x00010000 && codePoint <= 0x0010FFFF then
+                        -- Code point must be split into a surrogate pair of
+                        -- UTF-16 code units
+                        let
+                            subtracted =
+                                codePoint - 0x00010000
+
+                            leading =
+                                (Bitwise.shiftRight subtracted 10) + 0xD800
+
+                            trailing =
+                                (Bitwise.and subtracted 1023) + 0xDC00
+                        in
+                            splitAndReverse rest
+                                (trailing :: leading :: accumulated)
+                    else if codePoint >= 0xE000 && codePoint <= 0xFFFF then
+                        -- Code point is valid UTF-16 code unit, use it as is
+                        -- and continue with remaining code points
+                        splitAndReverse rest (codePoint :: accumulated)
+                    else
+                        -- Should never happen - invalid code point, replace
+                        -- it with the replacement character and continue with
+                        -- remaining code points
+                        splitAndReverse rest
+                            (replacementCodePoint :: accumulated)
+
+        allCodeUnits =
+            List.reverse (splitAndReverse allCodePoints [])
+    in
+        String.fromList (List.map Char.fromCode allCodeUnits)

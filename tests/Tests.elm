@@ -11,6 +11,7 @@ import Expect
 --import DasherizeTest exposing (dasherizeClaims)
 --import HumanizeTest exposing (humanizeClaims)
 --import UnindentTest exposing (unindentClaims)
+import UnicodeTests exposing (unicodeTests)
 
 
 tail : String -> String
@@ -532,4 +533,5 @@ all =
         --, ellipsisClaims
         , unquoteTest
         , wrapTest
+        , unicodeTests
         ]
