@@ -1,16 +1,21 @@
-module Tests exposing (..)
+port module Main exposing (..)
 
 import String.Extra exposing (..)
+import Test.Runner.Node exposing (run)
 import String exposing (uncons, fromChar, toUpper, toLower)
-import Regex
 import Test exposing (..)
 import Fuzz exposing (..)
+import Json.Encode exposing (Value)
 import Expect
+import ReplaceSliceTest exposing (replaceSliceTest)
+
+
 --import CamelizeTest exposing (camelizeClaims)
 --import UnderscoredTest exposing (underscoredClaims)
 --import DasherizeTest exposing (dasherizeClaims)
 --import HumanizeTest exposing (humanizeClaims)
 --import UnindentTest exposing (unindentClaims)
+
 import UnicodeTests exposing (unicodeTests)
 
 
@@ -25,7 +30,7 @@ toSentenceCaseTest =
         [ fuzz string "It converts the first char of the string to uppercase" <|
             \string ->
                 let
-                    result = 
+                    result =
                         string
                             |> toSentenceCase
                             |> uncons
@@ -39,7 +44,6 @@ toSentenceCaseTest =
                             |> Maybe.withDefault ""
                 in
                     Expect.equal expected result
-
         , fuzz string "The tail of the string remains untouched" <|
             \string ->
                 let
@@ -73,7 +77,6 @@ decapitalizeTest =
                             |> Maybe.withDefault ""
                 in
                     Expect.equal expected result
-
         , fuzz string "It does not change the tail of the string" <|
             \string ->
                 let
@@ -106,10 +109,9 @@ toTitleCaseTest =
                             |> List.map toSentenceCase
                 in
                     Expect.equal expected result
-
         , fuzz (list string) "It does not change the length of the string" <|
             \strings ->
-                let 
+                let
                     result =
                         strings
                             |> String.join " "
@@ -132,13 +134,11 @@ replaceTest =
             \string substitute ->
                 replace string substitute string
                     |> Expect.equal substitute
-
         , fuzz string "It substitutes multiple occurances" <|
             \string ->
                 replace "a" "b" string
                     |> String.contains "a"
                     |> Expect.false "Given string should not contain any 'a'"
-
         , test "It should replace special characters" <|
             \_ ->
                 replace "\\" "deepthought" "this is a special string \\"
@@ -147,62 +147,7 @@ replaceTest =
         ]
 
 
---replaceSliceClaims =
---    suite "replace"
---        [ claim "Result contains the substitution string"
---            `true`
---                (\( string, sub, start, end ) ->
---                    replaceSlice sub start end string |> String.contains sub
---                )
---            `for` replaceSliceProducer
---        , claim "Result string has the length of the substitution + string after removing the slice"
---            `that`
---                (\( string, sub, start, end ) ->
---                    replaceSlice sub start end string |> String.length
---                )
---            `is`
---                (\( string, sub, start, end ) ->
---                    (String.length string - (end - start)) + (String.length sub)
---                )
---            `for` replaceSliceProducer
---        , claim "Start of the original string remains the same"
---            `that`
---                (\( string, sub, start, end ) ->
---                    replaceSlice sub start end string |> String.slice 0 start
---                )
---            `is`
---                (\( string, _, start, _ ) ->
---                    String.slice 0 start string
---                )
---            `for` replaceSliceProducer
---        , claim "End of the original string remains the same"
---            `that`
---                (\( string, sub, start, end ) ->
---                    let
---                        replaced =
---                            replaceSlice sub start end string
---                    in
---                        replaced |> String.slice (start + (String.length sub)) (String.length replaced)
---                )
---            `is`
---                (\( string, _, _, end ) ->
---                    String.slice end (String.length string) string
---                )
---            `for` replaceSliceProducer
---        ]
---
---
---replaceSliceProducer : Producer ( String, String, Int, Int )
---replaceSliceProducer =
---    filter
---        (\( string, sub, start, end ) ->
---            (start < end)
---                && (String.length string >= end)
---                && (not <| String.isEmpty sub)
---        )
---        (tuple4 ( string, string, (rangeInt 0 10), (rangeInt 0 10) ))
---
---
+
 --breakClaims : Claim
 --breakClaims =
 --    suite "break"
@@ -259,29 +204,28 @@ replaceTest =
 --        ]
 --
 
+
 cleanTest : Test
 cleanTest =
     describe "clean"
         [ fuzz string "The String.split result is the same as String.words" <|
             \string ->
-                let 
+                let
                     result =
-                        string 
-                            |> clean 
+                        string
+                            |> clean
                             |> String.split " "
-                    
+
                     expected =
                         String.words string
                 in
                     Expect.equal expected result
-
         , fuzz string "It trims the string on the left side" <|
             \string ->
                 string
                     |> clean
                     |> String.startsWith " "
                     |> Expect.false "Did not trim the start of the string"
-
         , fuzz string "It trims the string on the right side" <|
             \string ->
                 string
@@ -289,6 +233,8 @@ cleanTest =
                     |> String.endsWith " "
                     |> Expect.false "Did not trim the end of the string"
         ]
+
+
 
 --insertAtClaims : Claim
 --insertAtClaims =
@@ -348,6 +294,7 @@ cleanTest =
 --        (tuple3 ( string, (rangeInt 0 10), string ))
 --
 
+
 isBlankTest : Test
 isBlankTest =
     describe "isBlank"
@@ -355,12 +302,12 @@ isBlankTest =
             \_ ->
                 isBlank ""
                     |> Expect.true "Did not return true"
-
         , test "Returns false if the given string is not blank" <|
             \_ ->
                 isBlank " Slartibartfast"
                     |> Expect.false "Did not return false"
         ]
+
 
 
 --classifyClaims : Claim
@@ -380,6 +327,7 @@ isBlankTest =
 --        ]
 --
 
+
 surroundTest : Test
 surroundTest =
     describe "surround"
@@ -389,21 +337,18 @@ surroundTest =
                     |> surround wrap
                     |> String.startsWith wrap
                     |> Expect.true "Did not start with the wrapping string"
-
         , fuzz2 string string "It ends with the wrapping string" <|
             \string wrap ->
                 string
                     |> surround wrap
                     |> String.endsWith wrap
                     |> Expect.true "Did not end with the wrapping string"
-
         , fuzz2 string string "It contains the original string" <|
             \string wrap ->
                 string
                     |> surround wrap
                     |> String.contains string
                     |> Expect.true "Did not contain the string"
-
         , fuzz2 string string "It does not have anything else inside" <|
             \string wrap ->
                 let
@@ -417,8 +362,11 @@ surroundTest =
         ]
 
 
+
 -- TODO: ensure this test only gets strings that contain the needle in the
 -- haystack?
+
+
 countOccurrencesTest : Test
 countOccurrencesTest =
     describe "countOccurrences"
@@ -435,22 +383,25 @@ countOccurrencesTest =
                         String.length (replace needle "" haystack)
                 in
                     Expect.equal expected result
-            ]
+        ]
 
 
 ellipsisTest : Test
 ellipsisTest =
     describe "ellipsis"
-        [ fuzz2 (intRange 3 20) string
-            "The resulting string length does not exceed the specified length" <|
+        [ fuzz2 (intRange 3 20)
+            string
+            "The resulting string length does not exceed the specified length"
+          <|
             \howLong string ->
                 ellipsis howLong string
                     |> String.length
                     |> (>=) howLong
                     |> Expect.true "Resulting string exceeds specified length"
-
-        , fuzz2 (intRange 3 20) string
-            "The resulting string contains three dots at the end if necessary" <|
+        , fuzz2 (intRange 3 20)
+            string
+            "The resulting string contains three dots at the end if necessary"
+          <|
             \howLong string ->
                 let
                     result =
@@ -459,12 +410,13 @@ ellipsisTest =
                     result
                         |> String.endsWith "..."
                         |> if String.length string > howLong then
-                               Expect.true "Should add ellipsis to this string"
+                            Expect.true "Should add ellipsis to this string"
                            else
-                               Expect.false "Should not add ellipsis"
-
-        , fuzz2 (intRange 3 20) string
-            "It starts with the left of the original string" <|
+                            Expect.false "Should not add ellipsis"
+        , fuzz2 (intRange 3 20)
+            string
+            "It starts with the left of the original string"
+          <|
             \howLong string ->
                 let
                     result =
@@ -499,7 +451,6 @@ wrapTest =
                     |> List.map (\str -> String.length str <= howLong)
                     |> List.all ((==) True)
                     |> Expect.true "Given string was not wrapped at requested length"
-
         , test "Does not wrap string shorter than the requested length" <|
             \_ ->
                 wrap 50 "Heart of Gold"
@@ -508,29 +459,38 @@ wrapTest =
         ]
 
 
-all : Test
+all : List Test
 all =
-    describe "String.Extra"
-        [ toSentenceCaseTest
-        , decapitalizeTest
-        , toTitleCaseTest
-        , replaceTest
-        --, replaceSliceClaims
-        --, breakClaims
-        --, softBreakClaims
-        , cleanTest
-        --, insertAtClaims
-        , isBlankTest
-        --, camelizeClaims
-        --, classifyClaims
-        , surroundTest
-        --, underscoredClaims
-        --, dasherizeClaims
-        --, humanizeClaims
-        --, unindentClaims
-        , countOccurrencesTest
-        , ellipsisTest
-        , unquoteTest
-        , wrapTest
-        , unicodeTests
-        ]
+    [ toSentenceCaseTest
+    , decapitalizeTest
+    , toTitleCaseTest
+    , replaceTest
+    , replaceSliceTest
+      --, breakClaims
+      --, softBreakClaims
+    , cleanTest
+      --, insertAtClaims
+    , isBlankTest
+      --, camelizeClaims
+      --, classifyClaims
+    , surroundTest
+      --, underscoredClaims
+      --, dasherizeClaims
+      --, humanizeClaims
+      --, unindentClaims
+    , countOccurrencesTest
+    , ellipsisTest
+    , unquoteTest
+    , wrapTest
+    , unicodeTests
+    ]
+
+
+main : Program Value
+main =
+    all
+        |> Test.concat
+        |> run emit
+
+
+port emit : ( String, Value ) -> Cmd msg
