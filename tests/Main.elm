@@ -13,9 +13,9 @@ import UnicodeTests exposing (unicodeTests)
 import CamelizeTest exposing (camelizeTest)
 import UnderscoredTest exposing (underscoredTest)
 import DasherizeTest exposing (dasherizeTest)
+import HumanizeTest exposing (humanizeTest)
 
 
---import HumanizeTest exposing (humanizeClaims)
 --import UnindentTest exposing (unindentClaims)
 
 
@@ -414,7 +414,7 @@ all =
     , surroundTest
     , underscoredTest
     , dasherizeTest
-      --, humanizeClaims
+    , humanizeTest
       --, unindentClaims
     , countOccurrencesTest
     , ellipsisTest
