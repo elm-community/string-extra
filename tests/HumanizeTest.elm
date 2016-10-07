@@ -8,6 +8,7 @@ import Shrink
 import String
 import String.Extra exposing (..)
 import Test exposing (..)
+import Regex
 
 
 humanizeTest : Test
@@ -44,8 +45,7 @@ humanizeTest =
                         String.toLower
                             >> replace "-" " "
                             >> replace "_" " "
-                            >> replace "  " " "
-                            >> replace "  " " "
+                            >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> " ")
                             >> String.trim
                 in
                     humanize (String.toLower s)
