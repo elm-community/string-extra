@@ -28,6 +28,7 @@ dasherizeTest =
                             >> replace " " "-"
                             >> replace "_" "-"
                             >> replace "--" "-"
+                            >> replace "--" "-"
                 in
                     dasherize (String.toLower s)
                         |> String.toLower

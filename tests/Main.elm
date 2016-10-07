@@ -14,9 +14,7 @@ import CamelizeTest exposing (camelizeTest)
 import UnderscoredTest exposing (underscoredTest)
 import DasherizeTest exposing (dasherizeTest)
 import HumanizeTest exposing (humanizeTest)
-
-
---import UnindentTest exposing (unindentClaims)
+import UnindentTest exposing (unindentTest)
 
 
 tail : String -> String
@@ -415,7 +413,7 @@ all =
     , underscoredTest
     , dasherizeTest
     , humanizeTest
-      --, unindentClaims
+    , unindentTest
     , countOccurrencesTest
     , ellipsisTest
     , unquoteTest
