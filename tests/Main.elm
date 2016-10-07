@@ -12,9 +12,9 @@ import Test.Runner.Node exposing (run)
 import UnicodeTests exposing (unicodeTests)
 import CamelizeTest exposing (camelizeTest)
 import UnderscoredTest exposing (underscoredTest)
+import DasherizeTest exposing (dasherizeTest)
 
 
---import DasherizeTest exposing (dasherizeClaims)
 --import HumanizeTest exposing (humanizeClaims)
 --import UnindentTest exposing (unindentClaims)
 
@@ -413,7 +413,7 @@ all =
     , classifyTest
     , surroundTest
     , underscoredTest
-      --, dasherizeClaims
+    , dasherizeTest
       --, humanizeClaims
       --, unindentClaims
     , countOccurrencesTest
