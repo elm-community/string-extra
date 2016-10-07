@@ -228,7 +228,7 @@ softBreak width string =
 
 softBreakRegexp : Int -> Regex.Regex
 softBreakRegexp width =
-    regex <| ".{1," ++ (toString width) ++ "}(\\s|$)|\\S+?(\\s|$)"
+    regex <| ".{1," ++ (toString width) ++ "}(\\s+|$)|\\S+?(\\s+|$)"
 
 
 {-| Trims the whitespace of both sides of the string and compresses

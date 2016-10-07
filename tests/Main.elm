@@ -1,13 +1,15 @@
 port module Main exposing (..)
 
-import String.Extra exposing (..)
-import Test.Runner.Node exposing (run)
-import String exposing (uncons, fromChar, toUpper, toLower)
-import Test exposing (..)
+import ClassifyTest exposing (classifyTest)
+import Expect
 import Fuzz exposing (..)
 import Json.Encode exposing (Value)
-import Expect
 import ReplaceSliceTest exposing (replaceSliceTest)
+import String exposing (uncons, fromChar, toUpper, toLower)
+import String.Extra exposing (..)
+import Test exposing (..)
+import Test.Runner.Node exposing (run)
+import UnicodeTests exposing (unicodeTests)
 
 
 --import CamelizeTest exposing (camelizeClaims)
@@ -15,8 +17,6 @@ import ReplaceSliceTest exposing (replaceSliceTest)
 --import DasherizeTest exposing (dasherizeClaims)
 --import HumanizeTest exposing (humanizeClaims)
 --import UnindentTest exposing (unindentClaims)
-
-import UnicodeTests exposing (unicodeTests)
 
 
 tail : String -> String
@@ -302,26 +302,6 @@ isBlankTest =
         ]
 
 
-
--- classifyClaims : Test
--- classifyClaims =
---     describe "classify"
---         [ fuzz string "It does not contain non-word characters" <|
---             \string ->
---                 classify string
---                     |> Regex.contains (Regex.regex "[\\W]")
---                     |> Expect.false "Non word characters detected"
---         , "It starts with an uppercase letter"
---             `that` (classify >> uncons >> Maybe.map fst)
---             `is` (String.trim >> String.toUpper >> uncons >> Maybe.map fst)
---             `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
---         , claim "It is camelized once replaced non word charactes with a compatible string"
---             `that` (classify >> uncons >> Maybe.map snd)
---             `is` (replace "." "-" >> camelize >> uncons >> Maybe.map snd)
---             `for` filter (Regex.contains (Regex.regex "^[a-zA-Z\\s\\.\\-\\_]+$")) string
---         ]
-
-
 surroundTest : Test
 surroundTest =
     describe "surround"
@@ -383,19 +363,13 @@ countOccurrencesTest =
 ellipsisTest : Test
 ellipsisTest =
     describe "ellipsis"
-        [ fuzz2 (intRange 3 20)
-            string
-            "The resulting string length does not exceed the specified length"
-          <|
+        [ fuzz2 (intRange 3 20) string "The resulting string length does not exceed the specified length" <|
             \howLong string ->
                 ellipsis howLong string
                     |> String.length
                     |> (>=) howLong
                     |> Expect.true "Resulting string exceeds specified length"
-        , fuzz2 (intRange 3 20)
-            string
-            "The resulting string contains three dots at the end if necessary"
-          <|
+        , fuzz2 (intRange 3 20) string "The resulting string contains three dots at the end if necessary" <|
             \howLong string ->
                 let
                     result =
@@ -407,10 +381,7 @@ ellipsisTest =
                             Expect.true "Should add ellipsis to this string"
                            else
                             Expect.false "Should not add ellipsis"
-        , fuzz2 (intRange 3 20)
-            string
-            "It starts with the left of the original string"
-          <|
+        , fuzz2 (intRange 3 20) string "It starts with the left of the original string" <|
             \howLong string ->
                 let
                     result =
@@ -466,7 +437,7 @@ all =
       --, insertAtClaims
     , isBlankTest
       --, camelizeClaims
-      --, classifyClaims
+    , classifyTest
     , surroundTest
       --, underscoredClaims
       --, dasherizeClaims
