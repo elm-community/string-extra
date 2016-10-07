@@ -228,64 +228,37 @@ cleanTest =
         ]
 
 
+insertAtTest : Test
+insertAtTest =
+    describe "insertAt"
+        [ fuzz insertAtProducer "Result contains the substitution string" <|
+            \( sub, at, string ) ->
+                string
+                    |> insertAt sub at
+                    |> String.contains sub
+                    |> Expect.true "Could not find substitution string in result"
+        , fuzz insertAtProducer "Resulting string has length as the sum of both arguments" <|
+            \( sub, at, string ) ->
+                insertAt sub at string
+                    |> String.length
+                    |> Expect.equal ((String.length sub) + (String.length string))
+        , fuzz insertAtProducer "Start of the string remains the same" <|
+            \( sub, at, string ) ->
+                insertAt sub at string
+                    |> String.slice 0 at
+                    |> Expect.equal (String.slice 0 at string)
+        , fuzz insertAtProducer "End of the string remains the same" <|
+            \( sub, at, string ) ->
+                insertAt sub at string
+                    |> String.slice (at + (String.length sub)) ((String.length string) + String.length sub)
+                    |> Expect.equal (String.slice at (String.length string) string)
+        ]
 
---insertAtClaims : Claim
---insertAtClaims =
---    suite "insertAt"
---        [ claim "Result contains the substitution string"
---            `true`
---                (\( sub, at, string ) ->
---                    string
---                        |> insertAt sub at
---                        |> String.contains sub
---                )
---            `for` insertAtProducer
---        , claim "Resulting string has length as the sum of both arguments"
---            `that`
---                (\( sub, at, string ) ->
---                    (String.length sub) + (String.length string)
---                )
---            `is`
---                (\( sub, at, string ) ->
---                    insertAt sub at string
---                        |> String.length
---                )
---            `for` insertAtProducer
---        , claim "Start of the string remains the same"
---            `that`
---                (\( sub, at, string ) ->
---                    String.slice 0 at string
---                )
---            `is`
---                (\( sub, at, string ) ->
---                    insertAt sub at string
---                        |> String.slice 0 at
---                )
---            `for` insertAtProducer
---        , claim "End of the string remains the same"
---            `that`
---                (\( sub, at, string ) ->
---                    String.slice at (String.length string) string
---                )
---            `is`
---                (\( sub, at, string ) ->
---                    insertAt sub at string
---                        |> String.slice (at + (String.length sub))
---                            ((String.length string) + String.length sub)
---                )
---            `for` insertAtProducer
---        ]
---
---
---insertAtProducer : Producer ( String, Int, String )
---insertAtProducer =
---    filter
---        (\( sub, at, string ) ->
---            (String.length string >= at)
---                && (not <| String.isEmpty sub)
---        )
---        (tuple3 ( string, (rangeInt 0 10), string ))
---
+
+insertAtProducer : Fuzzer ( String, Int, String )
+insertAtProducer =
+    tuple3 ( intRange 0 10, intRange 1 10, string )
+        |> map (\( a, b, s ) -> ( "b" ++ s, b, String.repeat (a + b) "a" ))
 
 
 isBlankTest : Test
@@ -434,7 +407,7 @@ all =
     , breakTest
     , softBreakTest
     , cleanTest
-      --, insertAtClaims
+    , insertAtTest
     , isBlankTest
       --, camelizeClaims
     , classifyTest
