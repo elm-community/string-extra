@@ -1,5 +1,5 @@
 {
-    "version": "1.0.2",
+    "version": "1.1.0",
     "summary": "String helper functions for Elm",
     "repository": "https://github.com/elm-community/string-extra.git",
     "license": "BSD3",
