@@ -147,62 +147,55 @@ replaceTest =
         ]
 
 
+breakTest : Test
+breakTest =
+    describe "break"
+        [ fuzz2 string (intRange 0 100) "The list should have as many elements as the ceil division of the length" <|
+            \string width ->
+                case ( string, width ) of
+                    ( "", _ ) ->
+                        break width string
+                            |> List.length
+                            |> Expect.equal 1
 
---breakClaims : Claim
---breakClaims =
---    suite "break"
---        [ claim "The list should have as many elements as the ceil division of the length"
---            `that` (\( string, width ) -> break width string |> List.length)
---            `is`
---                (\( string, width ) ->
---                    let
---                        b =
---                            toFloat (String.length string)
---
---                        r =
---                            ceiling (b / (toFloat width))
---                    in
---                        clamp 1 10 r
---                )
---            `for` tuple ( string, (rangeInt 1 10) )
---        , claim "Concatenating the result yields the original string"
---            `that` (\( string, width ) -> break width string |> String.concat)
---            `is` (\( string, _ ) -> string)
---            `for` tuple ( string, (rangeInt 1 10) )
---        , claim "No element in the list should have more than `width` chars"
---            `true`
---                (\( string, width ) ->
---                    break width string
---                        |> List.map (String.length)
---                        |> List.filter ((<) width)
---                        |> List.isEmpty
---                )
---            `for` tuple ( string, (rangeInt 1 10) )
---        ]
---
---
---softBreakClaims : Claim
---softBreakClaims =
---    suite "softBreak"
---        [ claim "Concatenating the result yields the original string"
---            `that` (\( string, width ) -> softBreak width string |> String.concat)
---            `is` (\( string, _ ) -> string)
---            `for` tuple ( string, (rangeInt 1 10) )
---        , claim "The list should not have more elements than words"
---            `true`
---                (\( string, width ) ->
---                    let
---                        broken =
---                            softBreak width string |> List.length
---
---                        words =
---                            String.words string |> List.length
---                    in
---                        broken <= words
---                )
---            `for` tuple ( string, (rangeInt 1 10) )
---        ]
---
+                    ( _, 0 ) ->
+                        break width string
+                            |> List.length
+                            |> Expect.equal 1
+
+                    _ ->
+                        break width string
+                            |> List.length
+                            |> Expect.equal (ceiling <| ((toFloat << String.length) string) / toFloat width)
+        , fuzz2 string (intRange 1 10) "Concatenating the result yields the original string" <|
+            \string width ->
+                break width string
+                    |> String.concat
+                    |> Expect.equal string
+        , fuzz2 string (intRange 1 10) "No element in the list should have more than `width` chars" <|
+            \string width ->
+                break width string
+                    |> List.map (String.length)
+                    |> List.filter ((<) width)
+                    |> List.isEmpty
+                    |> Expect.true "The list has some long elements"
+        ]
+
+
+softBreakTest : Test
+softBreakTest =
+    describe "softBreak"
+        [ fuzz2 string (intRange 1 10) "Concatenating the result yields the original string" <|
+            \string width ->
+                softBreak width (String.trim string)
+                    |> String.concat
+                    |> Expect.equal (String.trim string)
+        , fuzz2 string (intRange 1 10) "The list should not have more elements than words" <|
+            \string width ->
+                softBreak width string
+                    |> List.length
+                    |> Expect.atMost (String.words string |> List.length)
+        ]
 
 
 cleanTest : Test
@@ -310,22 +303,23 @@ isBlankTest =
 
 
 
---classifyClaims : Claim
---classifyClaims =
---    suite "classify"
---        [ claim "It does not contain non-word characters"
---            `false` (classify >> Regex.contains (Regex.regex "[\\W]"))
---            `for` string
---        , claim "It starts with an uppercase letter"
---            `that` (classify >> uncons >> Maybe.map fst)
---            `is` (String.trim >> String.toUpper >> uncons >> Maybe.map fst)
---            `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
---        , claim "It is camelized once replaced non word charactes with a compatible string"
---            `that` (classify >> uncons >> Maybe.map snd)
---            `is` (replace "." "-" >> camelize >> uncons >> Maybe.map snd)
---            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z\\s\\.\\-\\_]+$")) string
---        ]
---
+-- classifyClaims : Test
+-- classifyClaims =
+--     describe "classify"
+--         [ fuzz string "It does not contain non-word characters" <|
+--             \string ->
+--                 classify string
+--                     |> Regex.contains (Regex.regex "[\\W]")
+--                     |> Expect.false "Non word characters detected"
+--         , "It starts with an uppercase letter"
+--             `that` (classify >> uncons >> Maybe.map fst)
+--             `is` (String.trim >> String.toUpper >> uncons >> Maybe.map fst)
+--             `for` filter (not << Regex.contains (Regex.regex "[\\W_]")) string
+--         , claim "It is camelized once replaced non word charactes with a compatible string"
+--             `that` (classify >> uncons >> Maybe.map snd)
+--             `is` (replace "." "-" >> camelize >> uncons >> Maybe.map snd)
+--             `for` filter (Regex.contains (Regex.regex "^[a-zA-Z\\s\\.\\-\\_]+$")) string
+--         ]
 
 
 surroundTest : Test
@@ -466,8 +460,8 @@ all =
     , toTitleCaseTest
     , replaceTest
     , replaceSliceTest
-      --, breakClaims
-      --, softBreakClaims
+    , breakTest
+    , softBreakTest
     , cleanTest
       --, insertAtClaims
     , isBlankTest
