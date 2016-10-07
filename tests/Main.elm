@@ -10,9 +10,9 @@ import String.Extra exposing (..)
 import Test exposing (..)
 import Test.Runner.Node exposing (run)
 import UnicodeTests exposing (unicodeTests)
+import CamelizeTest exposing (camelizeTest)
 
 
---import CamelizeTest exposing (camelizeClaims)
 --import UnderscoredTest exposing (underscoredClaims)
 --import DasherizeTest exposing (dasherizeClaims)
 --import HumanizeTest exposing (humanizeClaims)
@@ -409,7 +409,7 @@ all =
     , cleanTest
     , insertAtTest
     , isBlankTest
-      --, camelizeClaims
+    , camelizeTest
     , classifyTest
     , surroundTest
       --, underscoredClaims
