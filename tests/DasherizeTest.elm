@@ -1,29 +1,57 @@
-module DasherizeTest exposing (dasherizeClaims)
+module DasherizeTest exposing (dasherizeTest)
 
-import String.Extra exposing (..)
-import String
-import Check exposing (Claim, suite, claim, that, is, for, true)
-import Check.Producer exposing (string, filter)
 import Char
-import Regex
+import Expect
+import Fuzz exposing (..)
+import Random.Pcg as Random
+import Shrink
+import String exposing (uncons)
+import String.Extra exposing (..)
+import Test exposing (..)
 
 
-dasherizeClaims : Claim
-dasherizeClaims =
-    suite "dasherize"
-        [ claim "It is a lowercased string"
-            `that` (dasherize >> String.toLower)
-            `is` (dasherize)
-            `for` string
-        , claim "It replaces spaces and underscores with a dash"
-            `that` (String.toLower >> dasherize)
-            `is` (String.toLower >> String.trim >> replace "  " " " >> replace " " "-" >> replace "_" "-" >> replace "--" "-")
-            `for` string
-        , claim "It puts dash before every single uppercase character"
-            `that` (dasherize)
-            `is` (replaceUppercase >> String.toLower)
-            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z]+$")) string
+dasherizeTest : Test
+dasherizeTest =
+    describe "dasherize"
+        [ fuzz string "It is a lowercased string" <|
+            \s ->
+                dasherize s
+                    |> String.toLower
+                    |> Expect.equal (dasherize s)
+        , fuzz string "It replaces spaces and underscores with a dash" <|
+            \s ->
+                let
+                    expected =
+                        String.toLower
+                            >> String.trim
+                            >> replace "  " " "
+                            >> replace " " "-"
+                            >> replace "_" "-"
+                            >> replace "--" "-"
+                            >> replace "--" "-"
+                in
+                    dasherize (String.toLower s)
+                        |> String.toLower
+                        |> Expect.equal (expected s)
+        , fuzz nonEmptyString "It puts dash before every single uppercase character" <|
+            \s ->
+                dasherize s
+                    |> Expect.equal (replaceUppercase s |> String.toLower)
         ]
+
+
+char : Random.Generator Char
+char =
+    Random.choices [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+
+
+nonEmptyString : Fuzzer String
+nonEmptyString =
+    let
+        producer =
+            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i char))
+    in
+        custom producer Shrink.string
 
 
 replaceUppercase : String -> String

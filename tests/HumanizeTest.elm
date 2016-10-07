@@ -1,42 +1,118 @@
-module HumanizeTest exposing (humanizeClaims)
+module HumanizeTest exposing (humanizeTest)
 
-import String.Extra exposing (..)
-import String
-import Check exposing (Claim, suite, claim, that, is, for, true, false)
-import Check.Producer exposing (string, filter)
 import Char
+import Expect
+import Fuzz exposing (..)
+import Random.Pcg as Random
+import Shrink
+import String
+import String.Extra exposing (..)
+import Test exposing (..)
 import Regex
 
 
-humanizeClaims : Claim
-humanizeClaims =
-    suite "humanize"
-        [ claim "It starts with an uppercase letter after trimming"
-            `that` (humanize >> String.uncons >> Maybe.map (fst >> String.fromChar) >> Maybe.withDefault "")
-            `is` (String.trim >> toSentenceCase >> String.uncons >> Maybe.map (fst >> String.fromChar) >> Maybe.withDefault "")
-            `for` filter (not << Regex.contains (Regex.regex "^[-_]+")) string
-        , claim "The tail of the string is lowercased"
-            `true` (humanize >> String.uncons >> Maybe.map snd >> Maybe.withDefault "" >> String.all (Char.isLower))
-            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z]$")) string
-        , claim "It replaces underscores and dashes with a single whitespace"
-            `that` (humanize >> String.toLower)
-            `is` (replace "-" " " >> replace "_" " " >> replace "  " " " >> String.trim)
-            `for` filter (Regex.contains (Regex.regex "^[a-z_-]$")) string
-        , claim "It yields the same string after removing underscores, dashes and spaces"
-            `that` (humanize >> replace " " "" >> String.toLower)
-            `is` (replace " " "" >> replace "-" "" >> replace "_" "" >> String.toLower)
-            `for` string
-        , claim "It adds a space before each uppercase letter"
-            `that` (humanize >> String.toLower)
-            `is` (replaceUppercase >> String.toLower >> String.trim)
-            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z]$")) string
-        , claim "It does not leave double spaces around"
-            `false` (humanize >> String.contains "  ")
-            `for` string
-        , claim "It strips the _id at the end"
-            `false` ((flip String.append) "_id" >> humanize >> String.endsWith "id")
-            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z_-]$")) string
+humanizeTest : Test
+humanizeTest =
+    describe "humanize"
+        [ fuzz (validWords []) "It starts with an uppercase letter after trimming" <|
+            \s ->
+                let
+                    expected =
+                        String.trim
+                            >> toSentenceCase
+                            >> String.uncons
+                            >> Maybe.map (fst >> String.fromChar)
+                            >> Maybe.withDefault ""
+                in
+                    humanize s
+                        |> String.uncons
+                        |> Maybe.map (fst >> String.fromChar)
+                        |> Maybe.withDefault ""
+                        |> Expect.equal (expected s)
+        , fuzz (validWords []) "The tail of the string is lowercased" <|
+            \s ->
+                humanize s
+                    |> String.uncons
+                    |> Maybe.map snd
+                    |> Maybe.withDefault "a"
+                    |> String.filter ((/=) ' ')
+                    |> String.all Char.isLower
+                    |> Expect.true "Not all characters in the string are lowercased"
+        , fuzz (validWords [ '_', '-' ]) "It replaces underscores and dashes with a single whitespace" <|
+            \s ->
+                let
+                    expected =
+                        String.toLower
+                            >> replace "-" " "
+                            >> replace "_" " "
+                            >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> " ")
+                            >> String.trim
+                in
+                    humanize (String.toLower s)
+                        |> String.toLower
+                        |> Expect.equal (expected s)
+        , fuzz string "It yields the same string after removing underscores, dashes and spaces" <|
+            \s ->
+                let
+                    expected =
+                        replace " " ""
+                            >> replace "-" ""
+                            >> replace "_" ""
+                            >> String.toLower
+                in
+                    humanize s
+                        |> replace " " ""
+                        |> String.toLower
+                        |> Expect.equal (expected s)
+        , fuzz (validWords []) "It adds a space before each uppercase letter" <|
+            \s ->
+                let
+                    expected =
+                        replaceUppercase >> String.toLower >> String.trim
+                in
+                    humanize s
+                        |> String.toLower
+                        |> Expect.equal (expected s)
+        , fuzz string "It does not leave double spaces around" <|
+            \s ->
+                let
+                    expected =
+                        replaceUppercase >> String.toLower >> String.trim
+                in
+                    humanize s
+                        |> String.contains "  "
+                        |> Expect.false "The string contains double spaces"
+        , fuzz idString "It strips the _id at the end" <|
+            \s ->
+                humanize s
+                    |> String.endsWith "id"
+                    |> Expect.false "The string should not end with id"
         ]
+
+
+idString : Fuzzer String
+idString =
+    validWords [ '-', '_' ]
+        |> map (\s -> s ++ "s_id")
+
+
+latinChars : List (Random.Generator Char)
+latinChars =
+    [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+
+
+withChar : List Char -> Random.Generator Char
+withChar ch =
+    Random.choices <| latinChars ++ (List.map Random.constant ch)
+
+
+validWords : List Char -> Fuzzer String
+validWords ch =
+    let
+        producer =
+            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i (withChar ch)))
+    in
+        custom producer Shrink.noShrink
 
 
 replaceUppercase : String -> String

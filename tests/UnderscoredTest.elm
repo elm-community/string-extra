@@ -1,29 +1,59 @@
-module UnderscoredTest exposing (underscoredClaims)
+module UnderscoredTest exposing (underscoredTest)
 
-import String.Extra exposing (..)
-import String
-import Check exposing (Claim, suite, claim, that, is, for, true)
-import Check.Producer exposing (string, filter)
 import Char
-import Regex
+import Expect
+import Fuzz exposing (..)
+import Random.Pcg as Random
+import Shrink
+import String exposing (uncons)
+import String.Extra exposing (..)
+import Test exposing (..)
 
 
-underscoredClaims : Claim
-underscoredClaims =
-    suite "underscored"
-        [ claim "It is a lowercased string"
-            `that` (underscored >> String.toLower)
-            `is` (underscored)
-            `for` string
-        , claim "It replaces spaces and dashes with an underscore"
-            `that` (String.toLower >> underscored)
-            `is` (String.toLower >> String.trim >> replace "  " " " >> replace " " "-" >> replace "-" "_" >> replace "__" "_")
-            `for` string
-        , claim "It puts an underscore before each uppercase characters group unless it starts with uppercase"
-            `that` (underscored)
-            `is` (replaceUppercase >> String.toLower)
-            `for` filter (Regex.contains (Regex.regex "^[a-zA-Z]+$")) string
+underscoredTest : Test
+underscoredTest =
+    describe "underscored"
+        [ fuzz string "It is a lowercased string" <|
+            \s ->
+                underscored s
+                    |> String.toLower
+                    |> Expect.equal (underscored s |> String.toLower)
+        , fuzz string "It replaces spaces and dashes with an underscore" <|
+            \s ->
+                let
+                    expected =
+                        String.toLower
+                            >> String.trim
+                            >> replace "  " " "
+                            >> replace " " "-"
+                            >> replace "-" "_"
+                            >> replace "__" "_"
+                            >> replace "__" "_"
+                in
+                    underscored (String.toLower s)
+                        |> Expect.equal (expected s)
+        , fuzz
+            nonEmptyString
+            "It puts an underscore before each uppercase characters group unless it starts with uppercase"
+          <|
+            \s ->
+                underscored s
+                    |> Expect.equal (replaceUppercase s |> String.toLower)
         ]
+
+
+char : Random.Generator Char
+char =
+    Random.choices [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+
+
+nonEmptyString : Fuzzer String
+nonEmptyString =
+    let
+        producer =
+            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i char))
+    in
+        custom producer Shrink.string
 
 
 replaceUppercase : String -> String

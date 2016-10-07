@@ -1,59 +1,51 @@
-module CamelizeTest exposing (camelizeClaims)
+module CamelizeTest exposing (camelizeTest)
 
-import String.Extra exposing (..)
+import Char
+import Expect
+import Fuzz exposing (..)
+import Random.Pcg as Random
+import Shrink
 import String
-import Check exposing (Claim, suite, claim, that, is, for, true)
-import Check.Producer exposing (string, filter)
+import String exposing (uncons)
+import String.Extra exposing (..)
+import Test exposing (..)
 
 
-camelizeClaims : Claim
-camelizeClaims =
-    suite "camelize"
-        [ claim "It does not contain dashes"
-            `true` (not << String.contains "-" << camelize)
-            `for` filter (\arg -> String.contains "-" arg) string
-        , claim "It does not contain underscores"
-            `true` (not << String.contains "_" << camelize)
-            `for` filter (\arg -> String.contains "_" arg) string
-        , claim "It is the same lowercased string after removing the dashes and spaces"
-            `that` (camelize >> String.toLower)
-            `is` (replace "-" "" >> replace "_" "" >> replace " " "" >> String.toLower)
-            `for` string
-        , claim "The first letter after each dash is capitalized"
-            `that` (camelize)
-            `is` (camelizeTest "-")
-            `for` filter
-                    (\arg ->
-                        (String.contains "-" arg)
-                            && not (String.contains "_" arg)
-                            && not (String.contains " " arg)
-                    )
-                    string
-        , claim "The first letter after each underscore is capitalized"
-            `that` (camelize)
-            `is` (camelizeTest "_")
-            `for` filter
-                    (\arg ->
-                        (String.contains "_" arg)
-                            && not (String.contains "-" arg)
-                            && not (String.contains " " arg)
-                    )
-                    string
-        , claim "The first letter after each space is capitalized"
-            `that` (camelize)
-            `is` (camelizeTest " ")
-            `for` filter
-                    (\arg ->
-                        (String.contains " " arg)
-                            && not (String.contains "-" arg)
-                            && not (String.contains "_" arg)
-                    )
-                    string
+camelizeTest : Test
+camelizeTest =
+    describe "camelize"
+        [ fuzz string "It does not contain dashes" <|
+            \s ->
+                camelize s
+                    |> String.contains "-"
+                    |> Expect.false "Camelize should remove dashes"
+        , fuzz string "It does not contain underscores" <|
+            \s ->
+                camelize s
+                    |> String.contains "-"
+                    |> Expect.false "Camelize should remove underscores"
+        , fuzz string "It is the same lowercased string after removing the dashes and spaces" <|
+            \s ->
+                let
+                    expected =
+                        replace "-" "" >> replace "_" "" >> replace " " "" >> String.toLower
+                in
+                    camelize s
+                        |> String.toLower
+                        |> Expect.equal (expected s)
+        , fuzz (validWords '-') "The first letter after each dash is capitalized" <|
+            \s ->
+                camelize s
+                    |> Expect.equal (runCamelize "-" s)
+        , fuzz (validWords ' ') "The first letter after each space is capitalized" <|
+            \s ->
+                camelize s
+                    |> Expect.equal (runCamelize " " s)
         ]
 
 
-camelizeTest : String -> String -> String
-camelizeTest separator string =
+runCamelize : String -> String -> String
+runCamelize separator string =
     string
         |> String.trim
         |> replace (separator ++ separator) separator
@@ -68,3 +60,22 @@ capitalizeOdds pos str =
         toSentenceCase str
     else
         str
+
+
+latinChars : List (Random.Generator Char)
+latinChars =
+    [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+
+
+withChar : Char -> Random.Generator Char
+withChar ch =
+    Random.choices <| latinChars ++ [ Random.constant ch ]
+
+
+validWords : Char -> Fuzzer String
+validWords ch =
+    let
+        producer =
+            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i (withChar ch)))
+    in
+        custom producer Shrink.string

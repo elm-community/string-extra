@@ -1,13 +1,32 @@
-sudo: false
 language: node_js
-  - "4.3"
+
+node_js:
+  - "5"
+
+cache:
+  directories:
+    - test/elm-stuff/build-artifacts
+    - sysconfcpus
+
+before_install:
+  - if [ ${TRAVIS_OS_NAME} == "osx" ];
+    then brew update; brew install nvm; mkdir ~/.nvm; export NVM_DIR=~/.nvm; source $(brew --prefix nvm)/nvm.sh;
+    fi
+  - | # epic build time improvement - see https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
+    if [ ! -d sysconfcpus/bin ];
+    then
+      git clone https://github.com/obmarg/libsysconfcpus.git;
+      cd libsysconfcpus;
+      ./configure --prefix=$TRAVIS_BUILD_DIR/sysconfcpus;
+      make && make install;
+      cd ..;
+    fi
+
 
 install:
   - npm install -g elm
+  - npm install -g elm-test
   - elm-package install -y
+  - pushd tests && elm-package install -y && popd
 
-before_script:
-    - cd tests
-    - elm-make Test.elm --yes --output test.js
-
-script: node test.js
+script: elm-test
