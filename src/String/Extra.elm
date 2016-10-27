@@ -761,7 +761,7 @@ unit in the surrogate pair separately:
     -- 💩 is U+1F4A9 PILE OF POO
     List.map Char.toCode (String.toList "💩!") == [ 55357, 56489, 33 ]
 
-`toCodePoints detects and combines surrogate pairs of code units to return a
+`toCodePoints` detects and combines surrogate pairs of code units to return a
 list of valid UTF-32 code points:
 
     toCodePoints "💩!" == [ 128169, 33 ]
