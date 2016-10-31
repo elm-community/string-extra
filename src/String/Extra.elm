@@ -668,7 +668,7 @@ rightOf : String -> String -> String
 rightOf pattern string =
     string
         |> Regex.find (AtMost 1) (regex <| (escape pattern) ++ "(.*)$")
-        |> List.map (.submatches >> Maybe.oneOf >> Maybe.withDefault "")
+        |> List.map (.submatches >> firstResult)
         |> String.join ""
 
 
@@ -681,8 +681,26 @@ leftOf : String -> String -> String
 leftOf pattern string =
     string
         |> Regex.find (AtMost 1) (regex <| "^(.*?)" ++ (escape pattern))
-        |> List.map (.submatches >> Maybe.oneOf >> Maybe.withDefault "")
+        |> List.map (.submatches >> firstResult)
         |> String.join ""
+
+
+firstResult : List (Maybe String) -> String
+firstResult list =
+    firstResultHelp "" list
+
+
+firstResultHelp : String -> List (Maybe String) -> String
+firstResultHelp default list =
+    case list of
+        [] ->
+            default
+
+        (Just a) :: _ ->
+            a
+
+        Nothing :: rest ->
+            firstResultHelp default rest
 
 
 {-| Searches a string from right to left for a pattern and returns a substring
@@ -887,7 +905,7 @@ fromCodePoints allCodePoints =
                                 codePoint - 0x00010000
 
                             leading =
-                                (Bitwise.shiftRight subtracted 10) + 0xD800
+                                (Bitwise.shiftRightBy 10 subtracted) + 0xD800
 
                             trailing =
                                 (Bitwise.and subtracted 1023) + 0xDC00
