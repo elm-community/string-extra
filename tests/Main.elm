@@ -1,25 +1,26 @@
 port module Main exposing (..)
 
+import CamelizeTest exposing (camelizeTest)
 import ClassifyTest exposing (classifyTest)
+import DasherizeTest exposing (dasherizeTest)
 import Expect
 import Fuzz exposing (..)
+import HumanizeTest exposing (humanizeTest)
 import Json.Encode exposing (Value)
 import ReplaceSliceTest exposing (replaceSliceTest)
 import String exposing (uncons, fromChar, toUpper, toLower)
 import String.Extra exposing (..)
 import Test exposing (..)
-import Test.Runner.Node exposing (run)
-import UnicodeTests exposing (unicodeTests)
-import CamelizeTest exposing (camelizeTest)
+import Test.Runner.Node exposing (run, TestProgram)
+import Tuple exposing (first, second)
 import UnderscoredTest exposing (underscoredTest)
-import DasherizeTest exposing (dasherizeTest)
-import HumanizeTest exposing (humanizeTest)
+import UnicodeTests exposing (unicodeTests)
 import UnindentTest exposing (unindentTest)
 
 
 tail : String -> String
 tail =
-    uncons >> Maybe.map snd >> Maybe.withDefault ""
+    uncons >> Maybe.map second >> Maybe.withDefault ""
 
 
 toSentenceCaseTest : Test
@@ -32,13 +33,13 @@ toSentenceCaseTest =
                         string
                             |> toSentenceCase
                             |> uncons
-                            |> Maybe.map (fst >> fromChar)
+                            |> Maybe.map (first >> fromChar)
                             |> Maybe.withDefault ""
 
                     expected =
                         string
                             |> uncons
-                            |> Maybe.map (fst >> fromChar >> toUpper)
+                            |> Maybe.map (first >> fromChar >> toUpper)
                             |> Maybe.withDefault ""
                 in
                     Expect.equal expected result
@@ -65,13 +66,13 @@ decapitalizeTest =
                         string
                             |> decapitalize
                             |> uncons
-                            |> Maybe.map (fst >> fromChar)
+                            |> Maybe.map (first >> fromChar)
                             |> Maybe.withDefault ""
 
                     expected =
                         string
                             |> uncons
-                            |> Maybe.map (fst >> fromChar >> toLower)
+                            |> Maybe.map (first >> fromChar >> toLower)
                             |> Maybe.withDefault ""
                 in
                     Expect.equal expected result
@@ -422,7 +423,7 @@ all =
     ]
 
 
-main : Program Value
+main : TestProgram
 main =
     all
         |> Test.concat

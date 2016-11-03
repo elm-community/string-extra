@@ -4,11 +4,12 @@ import Char
 import Expect
 import Fuzz exposing (..)
 import Random.Pcg as Random
+import Regex
 import Shrink
 import String
 import String.Extra exposing (..)
 import Test exposing (..)
-import Regex
+import Tuple exposing (first, second)
 
 
 humanizeTest : Test
@@ -21,19 +22,19 @@ humanizeTest =
                         String.trim
                             >> toSentenceCase
                             >> String.uncons
-                            >> Maybe.map (fst >> String.fromChar)
+                            >> Maybe.map (first >> String.fromChar)
                             >> Maybe.withDefault ""
                 in
                     humanize s
                         |> String.uncons
-                        |> Maybe.map (fst >> String.fromChar)
+                        |> Maybe.map (first >> String.fromChar)
                         |> Maybe.withDefault ""
                         |> Expect.equal (expected s)
         , fuzz (validWords []) "The tail of the string is lowercased" <|
             \s ->
                 humanize s
                     |> String.uncons
-                    |> Maybe.map snd
+                    |> Maybe.map second
                     |> Maybe.withDefault "a"
                     |> String.filter ((/=) ' ')
                     |> String.all Char.isLower
@@ -110,7 +111,7 @@ validWords : List Char -> Fuzzer String
 validWords ch =
     let
         producer =
-            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i (withChar ch)))
+            Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i (withChar ch)))
     in
         custom producer Shrink.noShrink
 

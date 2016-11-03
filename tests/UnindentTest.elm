@@ -5,6 +5,7 @@ import Fuzz exposing (..)
 import String exposing (uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
+import Tuple exposing (first)
 
 
 unindentTest : Test
@@ -44,7 +45,7 @@ unindentTest =
 
 multilineProducerString : Fuzzer String
 multilineProducerString =
-    map (convertToMultiline >> fst)
+    map (convertToMultiline >> first)
         (tuple3 ( intRange 0 10, intRange 0 10, intRange 0 10 ))
 
 

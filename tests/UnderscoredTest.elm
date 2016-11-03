@@ -51,7 +51,7 @@ nonEmptyString : Fuzzer String
 nonEmptyString =
     let
         producer =
-            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i char))
+            Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i char))
     in
         custom producer Shrink.string
 

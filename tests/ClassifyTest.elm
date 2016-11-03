@@ -10,6 +10,7 @@ import String
 import String exposing (uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
+import Tuple exposing (first, second)
 
 
 classifyTest : Test
@@ -25,15 +26,15 @@ classifyTest =
                 string
                     |> classify
                     |> uncons
-                    |> Maybe.map fst
-                    |> Expect.equal (string |> String.trim |> String.toUpper |> uncons |> Maybe.map fst)
+                    |> Maybe.map first
+                    |> Expect.equal (string |> String.trim |> String.toUpper |> uncons |> Maybe.map first)
         , fuzz (validWords 1 10) "It is camelized once replaced non word charactes with a compatible string" <|
             \string ->
                 string
                     |> classify
                     |> uncons
-                    |> Maybe.map snd
-                    |> Expect.equal (string |> replace "." "-" |> camelize |> uncons |> Maybe.map snd)
+                    |> Maybe.map second
+                    |> Expect.equal (string |> replace "." "-" |> camelize |> uncons |> Maybe.map second)
         ]
 
 
@@ -56,7 +57,7 @@ latinWords : Int -> Int -> Fuzzer String
 latinWords min max =
     let
         producer =
-            Random.int min max `Random.andThen` (\i -> Random.map String.fromList (Random.list i charGenerator))
+            Random.int min max |> Random.andThen (\i -> Random.map String.fromList (Random.list i charGenerator))
     in
         custom producer Shrink.string
 
@@ -65,6 +66,6 @@ validWords : Int -> Int -> Fuzzer String
 validWords min max =
     let
         producer =
-            Random.int min max `Random.andThen` (\i -> Random.map String.fromList (Random.list i validCharGenerator))
+            Random.int min max |> Random.andThen (\i -> Random.map String.fromList (Random.list i validCharGenerator))
     in
         custom producer Shrink.string

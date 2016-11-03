@@ -76,6 +76,6 @@ validWords : Char -> Fuzzer String
 validWords ch =
     let
         producer =
-            Random.int 1 10 `Random.andThen` (\i -> Random.map String.fromList (Random.list i (withChar ch)))
+            Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i (withChar ch)))
     in
         custom producer Shrink.string
