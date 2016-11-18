@@ -396,6 +396,24 @@ wrapTest =
         ]
 
 
+pluralizeTest : Test
+pluralizeTest =
+    describe "pluralize"
+        [ test "It uses the singular version when the count is one" <|
+            \() ->
+                pluralize "elf" "elves" 1
+                    |> Expect.equal "1 elf"
+        , test "It uses the plural version for > 1 count" <|
+            \() ->
+                pluralize "elf" "elves" 4
+                    |> Expect.equal "4 elves"
+        , test "It uses the plural version for 0 count" <|
+            \() ->
+                pluralize "elf" "elves" 0
+                    |> Expect.equal "0 elves"
+        ]
+
+
 all : List Test
 all =
     [ toSentenceCaseTest
@@ -420,6 +438,7 @@ all =
     , unquoteTest
     , wrapTest
     , unicodeTests
+    , pluralizeTest
     ]
 
 

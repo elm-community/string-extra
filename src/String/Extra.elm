@@ -39,6 +39,7 @@ module String.Extra
         , fromFloat
         , toCodePoints
         , fromCodePoints
+        , pluralize
         )
 
 {-| Additional functions for working with Strings
@@ -71,7 +72,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Formatting
 
-@docs clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags
+@docs clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags, pluralize
 
 ## Converting Lists
 
@@ -657,6 +658,21 @@ stripTags : String -> String
 stripTags string =
     string
         |> Regex.replace All (regex "<\\/?[^>]+>") (always "")
+
+
+{-| Given a number, a singular string, and a plural string, returns the number
+followed by a space, followed by either the singular string if the number was 1,
+or the plural string otherwise.
+    pluralize "elf" "elves" 2 == "2 elves"
+    pluralize "elf" "elves" 1 == "1 elf"
+    pluralize "elf" "elves" 0 == "0 elves"
+-}
+pluralize : String -> String -> number -> String
+pluralize singular plural count =
+    if count == 1 then
+        "1 " ++ singular
+    else
+        (toString count) ++ " " ++ plural
 
 
 {-| Searches a string from left to right for a pattern and returns a substring
