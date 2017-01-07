@@ -164,9 +164,10 @@ replace search substitution string =
 
 
 {-| Replace text within a portion of a string given a substitution
-string, a start index and an end index.
+string, a start index and an end index. The substitution includes the character 
+at the start index but not the one at the end index.
 
-    replaceSlice "Sue" 4 6 "Hi, Bob" == "Hi, Sue"
+    replaceSlice "Sue" 4 7 "Hi, Bob" == "Hi, Sue"
     replaceSlice "elephants" 0  6 "snakes on a plane!" == "elephants on a plane!"
     replaceSlice "under" 7  9 "snakes on a plane!" == "snakes under a plane!"
 
