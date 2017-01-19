@@ -16,6 +16,7 @@ import Tuple exposing (first, second)
 import UnderscoredTest exposing (underscoredTest)
 import UnicodeTests exposing (unicodeTests)
 import UnindentTest exposing (unindentTest)
+import NonEmptyTest exposing (nonEmptyTest)
 
 
 tail : String -> String
@@ -439,6 +440,7 @@ all =
     , wrapTest
     , unicodeTests
     , pluralizeTest
+    , nonEmptyTest
     ]
 
 

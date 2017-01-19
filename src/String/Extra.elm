@@ -40,6 +40,7 @@ module String.Extra
         , toCodePoints
         , fromCodePoints
         , pluralize
+        , nonEmpty
         )
 
 {-| Additional functions for working with Strings
@@ -56,7 +57,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Replace and Splice
 
-@docs replace, replaceSlice, insertAt, clean
+@docs replace, replaceSlice, insertAt, clean, nonEmpty
 
 ## Splitting
 
@@ -164,7 +165,7 @@ replace search substitution string =
 
 
 {-| Replace text within a portion of a string given a substitution
-string, a start index and an end index. The substitution includes the character 
+string, a start index and an end index. The substitution includes the character
 at the start index but not the one at the end index.
 
     replaceSlice "Sue" 4 7 "Hi, Bob" == "Hi, Sue"
@@ -944,3 +945,16 @@ fromCodePoints allCodePoints =
             List.reverse (splitAndReverse allCodePoints [])
     in
         String.fromList (List.map Char.fromCode allCodeUnits)
+
+
+{-| Converts a string to a Nothing when empty.
+
+    nonEmpty "" == Nothing
+    nonEmpty "Hello world" == Just "Hello world"
+-}
+nonEmpty : String -> Maybe String
+nonEmpty string =
+    if String.isEmpty string then
+        Nothing
+    else
+        Just string
