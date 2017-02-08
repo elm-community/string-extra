@@ -262,7 +262,7 @@ isBlank string =
 
 {-| Converts underscored or dasherized string to a camelized one.
 
-   camelize "-moz-transform" == "MozTransform"
+    camelize "-moz-transform" == "MozTransform"
 
 -}
 camelize : String -> String
