@@ -518,16 +518,17 @@ countOccurrences needle haystack =
             |> List.length
 
 
-{-| Truncates the string at the specified length and adds the append
-string only if the combined length of the truncated string and the append
-string have exactly the desired length.
+{-| Truncates the second string at the specified length if the string is
+longer than the specified length, and replaces the end of the truncated
+string with the first string, such that the resulting string is of the
+specified length.
 
-The resulting string will have at most the specified length
+The resulting string will have at most the specified length.
 
-    ellipsisWith 5 " .." "Hello World" == "Hello .."
-    ellipsisWith 10 " .."  "Hello World" == "Hello W..."
+    ellipsisWith 5 " .." "Hello World" == "He .."
+    ellipsisWith 10 " .."  "Hello World" == "Hello W .."
     ellipsisWith 10 " .." "Hello" == "Hello"
-    ellipsisWith 8 " .." "Hello World" == "Hello World"
+    ellipsisWith 8 " .." "Hello World" == "Hello .."
 
 -}
 ellipsisWith : Int -> String -> String -> String
@@ -538,16 +539,17 @@ ellipsisWith howLong append string =
         (String.left (howLong - (String.length append)) string) ++ append
 
 
-{-| Truncates the string at the specified length and appends
-three dots only if the truncated string + the 3 dots have exactly
-the desired length.
+{-| Truncates the string at the specified length if the string is
+longer than the specified length, and replaces the end of the truncated
+string with `"..."`, such that the resulting string is of the
+specified length.
 
-The resulting string will have at most the specified length
+The resulting string will have at most the specified length.
 
-    ellipsis 5 "Hello World" == "Hello..."
+    ellipsis 5 "Hello World" == "He..."
     ellipsis 10 "Hello World" == "Hello W..."
     ellipsis 10 "Hello" == "Hello"
-    ellipsis 8 "Hello World" == "Hello World"
+    ellipsis 8 "Hello World" == "Hello..."
 
 -}
 ellipsis : Int -> String -> String
@@ -555,22 +557,20 @@ ellipsis howLong string =
     ellipsisWith howLong "..." string
 
 
-{-| Truncates the string at the specified length and appends
-three dots only if the truncated string + the 3 dots have exactly
-the desired length.
+{-| Truncates the string at the last complete word less than or equal to
+the specified length and appends `"..."`. When the specified length is
+less than the length of the first word, the ellipsis is appended to the
+first word. When the specified length is greater than or equal to the
+length of the string, an identical string is returned.
 
-In contrast to `ellipsis`, this method will produced unfinished words,
-instead, it will find the closest complete word and apply the ellipsis from
-there.
+In contrast to `ellipsis`, this function will not produce incomplete
+words, and the resulting string can exceed the specified length. In
+addition, it removes trailing whitespace and punctuation characters at
+the end of the truncated string.
 
-Additionally, it will remove any trailing whitespace and punctuation characters
-at the end of the truncated string.
-
-The resulting string can in some cases exceed the specified length, by at most
-three characters.
-
+    softEllipsis 1 "Hello, World" == "Hello..."
     softEllipsis 5 "Hello, World" == "Hello..."
-    softEllipsis 8 "Hello, World" == "Hello..."
+    softEllipsis 6 "Hello, World" == "Hello..."
     softEllipsis 15 "Hello, cruel world" == "Hello, cruel..."
     softEllipsis 10 "Hello" == "Hello"
 
