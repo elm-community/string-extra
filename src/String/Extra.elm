@@ -235,7 +235,7 @@ softBreakRegexp width =
 
 
 {-| Trims the whitespace of both sides of the string and compresses
-reapeated whitespace internally to a single whitespace char.
+repeated whitespace internally to a single whitespace char.
 
     clean " The   quick brown   fox    " == "The quick brown fox"
 
@@ -281,7 +281,7 @@ camelize string =
 
 
 {-| Converts string to camelized string starting with an uppercase.
-All non word characters will be stripped out of the original string.
+All non-word characters will be stripped out of the original string.
 
     classify "some_class_name" == "SomeClassName"
     classify "myLittleCamel.class.name" == "MyLittleCamelClassName"
@@ -382,7 +382,7 @@ dasherize string =
         |> String.toLower
 
 
-{-| Separates a string into parts of a given width, using a given seperator.
+{-| Separates a string into parts of a given width, using a given separator.
 
 Look at `wrap` if you just want to wrap using newlines.
 
@@ -397,7 +397,7 @@ wrapWith width separator string =
         |> String.join separator
 
 
-{-| Chops a given string into parts of a given width, seperating them using a
+{-| Chops a given string into parts of a given width, separating them using a
 new line.
 
     wrap 7 "My very long text" === "My very\nlong te\nxt"
@@ -410,7 +410,7 @@ wrap width string =
 
 
 {-| Chops a given string into parts of a given width without breaking works apart,
-and then seperating them using a new line.
+and then separating them using a new line.
 
     softWrap 7 "My very long text" === "My very\nlong text"
     softWrap 3 "Hello World" === "Hello \nWorld"
@@ -423,7 +423,7 @@ softWrap width string =
 
 
 {-| Chops a given string into parts of a given width without breaking works apart,
-and then seperating them using the given separator.
+and then separating them using the given separator.
 
     softWrapWith 7 "..." "My very long text" === "My very...long text"
     softWrapWith 3 "\n" "Hello World" === "Hello \nWorld"
@@ -518,11 +518,11 @@ countOccurrences needle haystack =
             |> List.length
 
 
-{-| Truncates the string at the specified lenght and adds the append
-string only if the combined lenght of the truncated string and the append
-string have exactly the desired lenght.
+{-| Truncates the string at the specified length and adds the append
+string only if the combined length of the truncated string and the append
+string have exactly the desired length.
 
-The resulting string will have at most the specified lenght
+The resulting string will have at most the specified length
 
     ellipsisWith 5 " .." "Hello World" == "Hello .."
     ellipsisWith 10 " .."  "Hello World" == "Hello W..."
@@ -539,10 +539,10 @@ ellipsisWith howLong append string =
 
 
 {-| Truncates the string at the specified length and appends
-three dots only if the tructated string + the 3 dots have exactly
-the desired lenght.
+three dots only if the truncated string + the 3 dots have exactly
+the desired length.
 
-The resulting string will have at most the specified lenght
+The resulting string will have at most the specified length
 
     ellipsis 5 "Hello World" == "Hello..."
     ellipsis 10 "Hello World" == "Hello W..."
@@ -556,17 +556,17 @@ ellipsis howLong string =
 
 
 {-| Truncates the string at the specified length and appends
-three dots only if the tructated string + the 3 dots have exactly
-the desired lenght.
+three dots only if the truncated string + the 3 dots have exactly
+the desired length.
 
-In constrast to `ellipsis`, this method will produced unfinished words,
+In contrast to `ellipsis`, this method will produced unfinished words,
 instead, it will find the closest complete word and apply the ellipsis from
 there.
 
 Additionally, it will remove any trailing whitespace and punctuation characters
 at the end of the truncated string.
 
-The resulting stirng can in some cases exceed the specifed lenght, by at most
+The resulting string can in some cases exceed the specified length, by at most
 three characters.
 
     softEllipsis 5 "Hello, World" == "Hello..."
