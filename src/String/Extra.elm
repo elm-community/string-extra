@@ -101,9 +101,9 @@ import List
 import Bitwise
 
 
-{-| Changes the case of the first letter of a string to either Uppercase of
+{-| Change the case of the first letter of a string to either uppercase or
     lowercase, depending of the value of `wantedCase`. This is an internal
-    function for use in `toSencenceCase` and `decapitalize`.
+    function for use in `toSentenceCase` and `decapitalize`.
 
 -}
 changeCase : (Char -> Char) -> String -> String
@@ -113,7 +113,7 @@ changeCase mutator word =
         |> Maybe.withDefault ""
 
 
-{-| Make a string's first character uppercase
+{-| Capitalize the first letter of a string.
 
     toSentenceCase "this is a phrase" == "This is a phrase"
     toSentenceCase "hello, world" == "Hello, world"
@@ -124,7 +124,7 @@ toSentenceCase word =
     changeCase (toUpper) word
 
 
-{-| Make a string's first character lowercase.
+{-| Decapitalize the first letter of a string.
 
     decapitalize "This is a phrase" == "this is a phrase"
     decapitalize "Hello, World" == "hello, World"
@@ -135,7 +135,7 @@ decapitalize word =
     changeCase (toLower) word
 
 
-{-| Uppercase the first character of each word in a string
+{-| Capitalize the first character of each word in a string.
 
     toTitleCase "this is a phrase" == "This Is A Phrase"
     toTitleCase "hello, world" == "Hello, World"
@@ -178,7 +178,7 @@ replaceSlice substitution start end string =
     (String.slice 0 start string) ++ substitution ++ (String.slice end (String.length string) string)
 
 
-{-| Inserts a substring at the specified index.
+{-| Insert a substring at the specified index.
 
     insertAt "world" 6 "Hello " == "Hello world"
 -}
@@ -187,7 +187,7 @@ insertAt insert pos string =
     replaceSlice insert pos pos string
 
 
-{-| Breaks a string into a list of strings of maximum the provided size.
+{-| Break a string into a list of strings of a specified maximum length.
 
     break 10 "The quick brown fox" == ["The quick ", "brown fox"]
     break 2 "" == [""]
@@ -213,8 +213,8 @@ breaker width string acc =
                 ((String.slice 0 width string) :: acc)
 
 
-{-| Breaks a string into a list of strings of maximum the provided size,
-without cutting words at the edge.
+{-| Break a string into a list of strings of a specified maximum length,
+without truncating words.
 
     softBreak 6 "The quick brown fox" == ["The quick", " brown", " fox"]
 
@@ -234,7 +234,7 @@ softBreakRegexp width =
     regex <| ".{1," ++ (toString width) ++ "}(\\s+|$)|\\S+?(\\s+|$)"
 
 
-{-| Trims the whitespace of both sides of the string and compresses
+{-| Trim the whitespace of both sides of the string and compress
 repeated whitespace internally to a single whitespace char.
 
     clean " The   quick brown   fox    " == "The quick brown fox"
@@ -247,7 +247,7 @@ clean string =
         |> String.trim
 
 
-{-| Tests if a string is empty or only contains whitespace
+{-| Test if a string is empty or only contains whitespace.
 
     isBlank "" == True
     isBlank "\n" == True
@@ -260,7 +260,7 @@ isBlank string =
     Regex.contains (regex "^\\s*$") string
 
 
-{-| Converts underscored or dasherized string to a camelized one.
+{-| Convert an underscored or dasherized string to a camelized one.
 
     camelize "-moz-transform" == "MozTransform"
 
@@ -280,7 +280,7 @@ camelize string =
         (String.trim string)
 
 
-{-| Converts string to camelized string starting with an uppercase.
+{-| Convert a string to a camelized string starting with an uppercase letter.
 All non-word characters will be stripped out of the original string.
 
     classify "some_class_name" == "SomeClassName"
@@ -296,7 +296,7 @@ classify string =
         |> toSentenceCase
 
 
-{-| Surrounds a string with another string.
+{-| Surround a string with another string.
 
     surround "bar" "foo" == "barfoobar"
 
@@ -306,7 +306,7 @@ surround wrap string =
     wrap ++ string ++ wrap
 
 
-{-| Removes surrounding strings from another string.
+{-| Remove surrounding strings from another string.
 
     unsurround "foo" "foobarfoo" == "bar"
 
@@ -325,7 +325,7 @@ unsurround wrap string =
         string
 
 
-{-| Adds quotes to a string.
+{-| Add quotes to a string.
 
     quote "foo" == "\"foo\""
 
@@ -335,7 +335,7 @@ quote string =
     surround "\"" string
 
 
-{-| Removes quotes that surround a string.
+{-| Remove quotes that surround a string.
 
     unquote "\"foo\"" == "foo"
     unquote "\"foo\"bar\""
@@ -346,9 +346,9 @@ unquote string =
     unsurround "\"" string
 
 
-{-| Returns a string joined by underscores after separating it by its uppercase characters.
+{-| Return a string joined by underscores after separating it by its uppercase characters.
 Any sequence of spaces or dashes will also be converted to a single underscore.
-The final string will be lowercased
+The final string will be lowercased.
 
     underscore "SomeClassName" == "some_class_name"
     underscore "some-class-name" == "some_class_name"
@@ -364,9 +364,9 @@ underscored string =
         |> String.toLower
 
 
-{-| Returns a string joined by dashes after separating it by its uppercase characters.
-Any sequence of spaces or underscored will also be converted to a single dash.
-The final string will be lowercased
+{-| Return a string joined by dashes after separating it by its uppercase characters.
+Any sequence of spaces or underscores will also be converted to a single dash.
+The final string will be lowercased.
 
     dasherize "SomeClassName" == "-some-class-name"
     dasherize "some_class_name" = "some-class-name"
@@ -382,7 +382,7 @@ dasherize string =
         |> String.toLower
 
 
-{-| Separates a string into parts of a given width, using a given separator.
+{-| Separate a string into parts of a given width, using a given separator.
 
 Look at `wrap` if you just want to wrap using newlines.
 
@@ -397,7 +397,7 @@ wrapWith width separator string =
         |> String.join separator
 
 
-{-| Chops a given string into parts of a given width, separating them using a
+{-| Chop a given string into parts of a given width, separating them with a
 new line.
 
     wrap 7 "My very long text" === "My very\nlong te\nxt"
@@ -409,8 +409,8 @@ wrap width string =
     wrapWith width "\n" string
 
 
-{-| Chops a given string into parts of a given width without breaking works apart,
-and then separating them using a new line.
+{-| Chop a given string into parts of a given width without breaking words apart,
+and then separate them using a new line.
 
     softWrap 7 "My very long text" === "My very\nlong text"
     softWrap 3 "Hello World" === "Hello \nWorld"
@@ -422,8 +422,8 @@ softWrap width string =
     softWrapWith width "\n" string
 
 
-{-| Chops a given string into parts of a given width without breaking works apart,
-and then separating them using the given separator.
+{-| Chop a given string into parts of a given width without breaking words apart,
+and then separate them using the given separator.
 
     softWrapWith 7 "..." "My very long text" === "My very...long text"
     softWrapWith 3 "\n" "Hello World" === "Hello \nWorld"
@@ -437,9 +437,9 @@ softWrapWith width separator string =
         |> String.join separator
 
 
-{-| Converts an underscored, camelized, or dasherized string into one that can be read by humans.
-Also removes beginning and ending whitespace, and removes the postfix '_id'.
-The first character will be capitalized
+{-| Convert an underscored, camelized, or dasherized string into one that can be
+read by humans. Also remove beginning and ending whitespace, and removes the
+postfix '_id'. The first character will be capitalized.
 
     humanize "this_is_great" == "This is great"
     humanize "ThisIsGreat" = "This is great"
@@ -457,7 +457,7 @@ humanize string =
         |> toSentenceCase
 
 
-{-| Removes the least sequence of leading spaces or tabs on each line
+{-| Remove the shortest sequence of leading spaces or tabs on each line
 of the string, so that at least one of the lines will not have any
 leading spaces nor tabs and the rest of the lines will have the same
 amount of indentation removed.
@@ -503,7 +503,7 @@ unindent multilineSting =
             |> String.join "\n"
 
 
-{-| Returns the number of occurrences of a substring in another string
+{-| Return the number of occurrences of a substring in another string.
 
     countOccurrences "Hello" "Hello World" == 1
     countOccurrences "o" "Hello World" == 2
@@ -518,8 +518,8 @@ countOccurrences needle haystack =
             |> List.length
 
 
-{-| Truncates the second string at the specified length if the string is
-longer than the specified length, and replaces the end of the truncated
+{-| Truncate the second string at the specified length if the string is
+longer than the specified length, and replace the end of the truncated
 string with the first string, such that the resulting string is of the
 specified length.
 
@@ -539,8 +539,8 @@ ellipsisWith howLong append string =
         (String.left (howLong - (String.length append)) string) ++ append
 
 
-{-| Truncates the string at the specified length if the string is
-longer than the specified length, and replaces the end of the truncated
+{-| Truncate the string at the specified length if the string is
+longer than the specified length, and replace the end of the truncated
 string with `"..."`, such that the resulting string is of the
 specified length.
 
@@ -557,8 +557,8 @@ ellipsis howLong string =
     ellipsisWith howLong "..." string
 
 
-{-| Truncates the string at the last complete word less than or equal to
-the specified length and appends `"..."`. When the specified length is
+{-| Truncate the string at the last complete word less than or equal to
+the specified length and append `"..."`. When the specified length is
 less than the length of the first word, the ellipsis is appended to the
 first word. When the specified length is greater than or equal to the
 length of the string, an identical string is returned.
@@ -588,7 +588,7 @@ softEllipsis howLong string =
             |> flip String.append "..."
 
 
-{-| Converts a list of strings into a human formatted readable list
+{-| Convert a list of strings into a human-readable list.
 
     toSentence [] == ""
     toSentence ["lions"] == "lions"
@@ -606,7 +606,7 @@ toSentence list =
             toSentenceBaseCase list
 
 
-{-| Converts a list of strings into a human formatted readable list using an oxford comma
+{-| Convert a list of strings into a human-readable list using an oxford comma.
 
     toSentenceOxford [] == ""
     toSentenceOxford ["lions"] == "lions"
@@ -650,7 +650,7 @@ toSentenceHelper lastPart sentence list =
             toSentenceHelper lastPart (sentence ++ ", " ++ x) xs
 
 
-{-| Removes all HTML tags from the string, preserving the text inside them.
+{-| Remove all HTML tags from the string, preserving the text inside them.
 
     stripTags "a <a href=\"#\">link</a>" == "a link"
     stripTags "<script>alert('hello world!')</script> == "alert('hello world!')"
@@ -662,9 +662,10 @@ stripTags string =
         |> Regex.replace All (regex "<\\/?[^>]+>") (always "")
 
 
-{-| Given a number, a singular string, and a plural string, returns the number
+{-| Given a number, a singular string, and a plural string, return the number
 followed by a space, followed by either the singular string if the number was 1,
 or the plural string otherwise.
+
     pluralize "elf" "elves" 2 == "2 elves"
     pluralize "elf" "elves" 1 == "1 elf"
     pluralize "elf" "elves" 0 == "0 elves"
@@ -677,7 +678,7 @@ pluralize singular plural count =
         (toString count) ++ " " ++ plural
 
 
-{-| Searches a string from left to right for a pattern and returns a substring
+{-| Search a string from left to right for a pattern and return a substring
 consisting of the characters in the string that are to the right of the pattern.
 
     rightOf "_" "This_is_a_test_string" == "is_a_test_string"
@@ -690,7 +691,7 @@ rightOf pattern string =
         |> String.join ""
 
 
-{-| Searches a string from left to right for a pattern and returns a substring
+{-| Search a string from left to right for a pattern and return a substring
 consisting of the characters in the string that are to the left of the pattern.
 
     leftOf "_" "This_is_a_test_string" == "This"
@@ -721,7 +722,7 @@ firstResultHelp default list =
             firstResultHelp default rest
 
 
-{-| Searches a string from right to left for a pattern and returns a substring
+{-| Search a string from right to left for a pattern and return a substring
 consisting of the characters in the string that are to the right of the pattern.
 
     rightOfBack "_" "This_is_a_test_string" == "string"
@@ -736,8 +737,8 @@ rightOfBack pattern string =
         |> Maybe.withDefault ""
 
 
-{-| Searches a string from right to left for a pattern and returns a substring
-consisting of the characters in the string that are to the right of the pattern.
+{-| Search a string from right to left for a pattern and return a substring
+consisting of the characters in the string that are to the left of the pattern.
 
     leftOfBack "_" "This_is_a_test_string" == "This_is_a_test"
 -}
@@ -751,20 +752,20 @@ leftOfBack pattern string =
         |> Maybe.withDefault ""
 
 
-{-| Turn an Int into a String.
+{-| Turn an integer into a string.
 
 This works the same way as `Basics.toString` except its type is restricted,
-so if you accidentally pass it something other than an Int, you get an error.
+so if you accidentally pass it something other than an `Int`, you get an error.
 -}
 fromInt : Int -> String
 fromInt =
     toString
 
 
-{-| Turns a Float into a String.
+{-| Turn a floating-point number into a string.
 
 This works the same way as `Basics.toString` except its type is restricted,
-so if you accidentally pass it something other than a Float, you get an error.
+so if you accidentally pass it something other than a `Float`, you get an error.
 -}
 fromFloat : Float -> String
 fromFloat =
@@ -780,13 +781,13 @@ replacementCodePoint =
     0xFFFD
 
 
-{-| Converts a String into a list of UTF-32 code points.
+{-| Convert a string into a list of UTF-32 code points.
 
     toCodePoints "abc" == [ 97, 98, 99 ]
     toCodePoints "©§π" == [ 169, 167, 960 ]
 
 If every character in the string can be represented by a single UTF-16 code
-unit, `toCodePoints` is equivalent to
+unit, `toCodePoints` is equivalent to:
 
     String.toList >> List.map Char.toCode
 
@@ -881,14 +882,14 @@ toCodePoints string =
         List.reverse (combineAndReverse allCodeUnits [])
 
 
-{-| Converts a list of UTF-32 code points into a String. Inverse of
+{-| Convert a list of UTF-32 code points into a string. Inverse of
 `toCodePoints`.
 
     fromCodePoints [ 97, 98, 99 ] == "abc"
     fromCodePoints [ 169, 167, 960 ] == "©§π"
 
 If every code point is a valid UTF-16 code unit, `fromCodePoints` is equivalent
-to
+to:
 
     List.map Char.fromCode >> String.fromList
 
@@ -947,7 +948,7 @@ fromCodePoints allCodePoints =
         String.fromList (List.map Char.fromCode allCodeUnits)
 
 
-{-| Converts a string to a Nothing when empty.
+{-| Convert a string to a Nothing when empty.
 
     nonEmpty "" == Nothing
     nonEmpty "Hello world" == Just "Hello world"
