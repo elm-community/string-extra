@@ -17,6 +17,7 @@ import UnderscoredTest exposing (underscoredTest)
 import UnicodeTests exposing (unicodeTests)
 import UnindentTest exposing (unindentTest)
 import NonEmptyTest exposing (nonEmptyTest)
+import RemoveAccentsTest exposing (removeAccentsTest)
 
 
 tail : String -> String
@@ -441,6 +442,7 @@ all =
     , unicodeTests
     , pluralizeTest
     , nonEmptyTest
+    , removeAccentsTest
     ]
 
 
