@@ -973,27 +973,34 @@ removeAccents string =
         string
     else
         let
-            matches =
-                [ ( "[à-æ]", "a" )
-                , ( "[À-Æ]", "A" )
-                , ( "ç", "c" )
-                , ( "Ç", "C" )
-                , ( "[è-ë]", "e" )
-                , ( "[È-Ë]", "E" )
-                , ( "[ì-ï]", "i" )
-                , ( "[Ì-Ï]", "I" )
-                , ( "ñ", "n" )
-                , ( "Ñ", "N" )
-                , ( "[ò-ö]", "o" )
-                , ( "[Ò-Ö]", "O" )
-                , ( "[ù-ü]", "u" )
-                , ( "[Ù-Ü]", "U" )
-                , ( "ý", "y" )
-                , ( "ÿ", "y" )
-                , ( "Ý", "Y" )
-                ]
-
-            do_regex_to_remove_acents ( match, replace_character ) =
-                Regex.replace Regex.All (Regex.regex match) (\_ -> replace_character)
+            do_regex_to_remove_acents ( regex, replace_character ) =
+                Regex.replace Regex.All regex (\_ -> replace_character)
         in
-            List.foldl do_regex_to_remove_acents string matches
+            List.foldl do_regex_to_remove_acents string accentRegex
+
+{-| Create list with regex and char to replace.
+-}            
+accentRegex : List (Regex.Regex, String)
+accentRegex =
+    let
+        matches =
+            [ ( "[à-æ]", "a" )
+            , ( "[À-Æ]", "A" )
+            , ( "ç", "c" )
+            , ( "Ç", "C" )
+            , ( "[è-ë]", "e" )
+            , ( "[È-Ë]", "E" )
+            , ( "[ì-ï]", "i" )
+            , ( "[Ì-Ï]", "I" )
+            , ( "ñ", "n" )
+            , ( "Ñ", "N" )
+            , ( "[ò-ö]", "o" )
+            , ( "[Ò-Ö]", "O" )
+            , ( "[ù-ü]", "u" )
+            , ( "[Ù-Ü]", "U" )
+            , ( "ý", "y" )
+            , ( "ÿ", "y" )
+            , ( "Ý", "Y" )
+            ]
+    in
+        List.map (\(rule, char) -> ( (Regex.regex rule), char) ) matches
