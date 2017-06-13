@@ -64,21 +64,28 @@ replaceSliceTest =
 
 replaceSliceProducer : Fuzzer ( String, String, Int, Int )
 replaceSliceProducer =
-    string
-        |> andThen
-            (\s ->
-                tuple3
-                    ( constant s
-                    , string
-                    , intRange 0 ((String.length s) - 1)
-                    )
-            )
-        |> andThen
-            (\( s1, s2, i ) ->
-                tuple4
-                    ( constant s1
-                    , constant s2
-                    , constant i
-                    , intRange (i + 1) (String.length s1)
-                    )
-            )
+    let
+        validIntRange i1 i2 =
+            if i2 > i1 then
+                intRange i1 i2
+            else
+                constant i1
+    in
+        string
+            |> andThen
+                (\s ->
+                    tuple3
+                        ( constant s
+                        , string
+                        , validIntRange 0 ((String.length s) - 1)
+                        )
+                )
+            |> andThen
+                (\( s1, s2, i ) ->
+                    tuple4
+                        ( constant s1
+                        , constant s2
+                        , constant i
+                        , validIntRange (i + 1) (String.length s1)
+                        )
+                )

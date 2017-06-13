@@ -10,7 +10,7 @@ import Expect
 
 bmpCodePointFuzzer : Fuzzer Int
 bmpCodePointFuzzer =
-    frequencyOrCrash
+    frequency
         [ ( 1, intRange 0 0xD7FF )
         , ( 1, intRange 0xE000 0xFFFF )
         ]
@@ -33,7 +33,7 @@ unicodeStringFuzzer =
                 |> map (\( leading, trailing ) -> [ leading, trailing ])
 
         sublistFuzzer =
-            frequencyOrCrash
+            frequency
                 [ ( 1, singletonFuzzer )
                 , ( 1, surrogatePairFuzzer )
                 ]
@@ -50,7 +50,7 @@ codePointFuzzer =
         astralCodePointFuzzer =
             intRange 0x00010000 0x0010FFFF
     in
-        frequencyOrCrash
+        frequency
             [ ( 1, bmpCodePointFuzzer )
             , ( 1, astralCodePointFuzzer )
             ]
@@ -102,17 +102,17 @@ unicodeTests =
                     |> Expect.equal (expectedStringLength codePoints)
         , describe "toCodePoints works as expected on hard-coded test cases"
             (hardCodedTestCases
-                |> List.map
-                    (\( string, codePoints ) ->
-                        test "toCodePoints works properly"
+                |> List.indexedMap
+                    (\index ( string, codePoints ) ->
+                        test ("toCodePoints works properly - test case " ++ toString index)
                             (\() -> toCodePoints string |> Expect.equal codePoints)
                     )
             )
         , describe "fromCodePoints works as expected on hard-coded test cases"
             (hardCodedTestCases
-                |> List.map
-                    (\( string, codePoints ) ->
-                        test "fromCodePoints works properly"
+                |> List.indexedMap
+                    (\index ( string, codePoints ) ->
+                        test ("fromCodePoints works properly - test case " ++ toString index)
                             (\() -> fromCodePoints codePoints |> Expect.equal string)
                     )
             )

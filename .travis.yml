@@ -1,11 +1,13 @@
 language: node_js
+node_js: node
 
-node_js:
-  - "5"
 
 cache:
   directories:
+    - elm-stuff/build-artifacts
+    - elm-stuff/packages
     - test/elm-stuff/build-artifacts
+    - test/elm-stuff/packages
     - sysconfcpus
 
 before_install:
@@ -22,11 +24,13 @@ before_install:
       cd ..;
     fi
 
-
 install:
-  - npm install -g elm
-  - npm install -g elm-test@0.18.0
-  - elm-package install -y
-  - pushd tests && elm-package install -y && popd
+  - npm install -g elm elm-test@0.18.6
 
-script: elm-test
+
+before_script:
+  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make --yes ./src/String/Extra.elm
+  - cd tests && $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make --yes *.elm && cd ..
+
+script:
+  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-test
