@@ -39,11 +39,12 @@ humanizeTest =
                     |> String.filter ((/=) ' ')
                     |> String.all Char.isLower
                     |> Expect.true "Not all characters in the string are lowercased"
-        , fuzz (validWords [ '_', '-' ]) "It replaces underscores and dashes with a single whitespace" <|
+        , fuzz (validWords [ '_', '-' ]) "It removes a trailing `_id` & replaces underscores and dashes with a single whitespace" <|
             \s ->
                 let
                     expected =
                         String.toLower
+                            >> Regex.replace (Regex.AtMost 1) (Regex.regex "_id$") (\_ -> "")
                             >> replace "-" " "
                             >> replace "_" " "
                             >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> " ")
