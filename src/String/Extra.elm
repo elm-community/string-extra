@@ -41,6 +41,7 @@ module String.Extra
         , fromCodePoints
         , pluralize
         , nonEmpty
+        , removeAccents
         )
 
 {-| Additional functions for working with Strings
@@ -959,3 +960,47 @@ nonEmpty string =
         Nothing
     else
         Just string
+
+
+{-| Remove accents from string.
+
+    removeAccents "andré" == "andre"
+    removeAccents "Atenção" == "Atencao"
+-}
+removeAccents : String -> String
+removeAccents string =
+    if String.isEmpty string then
+        string
+    else
+        let
+            do_regex_to_remove_acents ( regex, replace_character ) =
+                Regex.replace Regex.All regex (\_ -> replace_character)
+        in
+            List.foldl do_regex_to_remove_acents string accentRegex
+
+{-| Create list with regex and char to replace.
+-}            
+accentRegex : List (Regex.Regex, String)
+accentRegex =
+    let
+        matches =
+            [ ( "[à-æ]", "a" )
+            , ( "[À-Æ]", "A" )
+            , ( "ç", "c" )
+            , ( "Ç", "C" )
+            , ( "[è-ë]", "e" )
+            , ( "[È-Ë]", "E" )
+            , ( "[ì-ï]", "i" )
+            , ( "[Ì-Ï]", "I" )
+            , ( "ñ", "n" )
+            , ( "Ñ", "N" )
+            , ( "[ò-ö]", "o" )
+            , ( "[Ò-Ö]", "O" )
+            , ( "[ù-ü]", "u" )
+            , ( "[Ù-Ü]", "U" )
+            , ( "ý", "y" )
+            , ( "ÿ", "y" )
+            , ( "Ý", "Y" )
+            ]
+    in
+        List.map (\(rule, char) -> ( (Regex.regex rule), char) ) matches

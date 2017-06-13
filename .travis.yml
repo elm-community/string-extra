@@ -25,7 +25,7 @@ before_install:
 
 install:
   - npm install -g elm
-  - npm install -g elm-test
+  - npm install -g elm-test@0.18.0
   - elm-package install -y
   - pushd tests && elm-package install -y && popd
 
