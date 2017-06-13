@@ -12,7 +12,7 @@ removeAccentsTest =
             \() ->
                 removeAccents "áàãâäéèêëíìîïóòõôöúùûüçÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÖÔÚÙÛÜÇ"
                     |> Expect.equal "aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC"
-        , test "Should result in phrase without acents" <|
+        , test "Should result in phrase without accents" <|
             \() ->
                 removeAccents "andré JOÂO"
                     |> Expect.equal "andre JOAO"
