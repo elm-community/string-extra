@@ -1,23 +1,12 @@
-port module Main exposing (..)
+module Tests exposing (..)
 
-import CamelizeTest exposing (camelizeTest)
-import ClassifyTest exposing (classifyTest)
-import DasherizeTest exposing (dasherizeTest)
 import Expect
 import Fuzz exposing (..)
-import HumanizeTest exposing (humanizeTest)
 import Json.Encode exposing (Value)
-import ReplaceSliceTest exposing (replaceSliceTest)
 import String exposing (uncons, fromChar, toUpper, toLower)
 import String.Extra exposing (..)
 import Test exposing (..)
-import Test.Runner.Node exposing (run, TestProgram)
 import Tuple exposing (first, second)
-import UnderscoredTest exposing (underscoredTest)
-import UnicodeTests exposing (unicodeTests)
-import UnindentTest exposing (unindentTest)
-import NonEmptyTest exposing (nonEmptyTest)
-import RemoveAccentsTest exposing (removeAccentsTest)
 
 
 tail : String -> String
@@ -414,43 +403,3 @@ pluralizeTest =
                 pluralize "elf" "elves" 0
                     |> Expect.equal "0 elves"
         ]
-
-
-all : List Test
-all =
-    [ toSentenceCaseTest
-    , decapitalizeTest
-    , toTitleCaseTest
-    , replaceTest
-    , replaceSliceTest
-    , breakTest
-    , softBreakTest
-    , cleanTest
-    , insertAtTest
-    , isBlankTest
-    , camelizeTest
-    , classifyTest
-    , surroundTest
-    , underscoredTest
-    , dasherizeTest
-    , humanizeTest
-    , unindentTest
-    , countOccurrencesTest
-    , ellipsisTest
-    , unquoteTest
-    , wrapTest
-    , unicodeTests
-    , pluralizeTest
-    , nonEmptyTest
-    , removeAccentsTest
-    ]
-
-
-main : TestProgram
-main =
-    all
-        |> Test.concat
-        |> run emit
-
-
-port emit : ( String, Value ) -> Cmd msg
