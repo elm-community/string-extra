@@ -11,6 +11,14 @@ Contributing
 Pull requests are welcome. If you want to talk to us, join us on the
 `#elm-community` or `#string-extra` channels on the [Elm Slack](https://elmlang.slack.com).
 
+Testing
+-------
+
+```
+npm i
+npm run test
+```
+
 Maintainers
 -----------
 

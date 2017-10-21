@@ -1,0 +1,25 @@
+{
+  "name": "string-extra",
+  "version": "1.0.0",
+  "description": "string-extra ============",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "elm-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elm-community/string-extra.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elm-community/string-extra/issues"
+  },
+  "homepage": "https://github.com/elm-community/string-extra#readme",
+  "dependencies": {
+    "elm-test": "^0.18.9"
+  }
+}
