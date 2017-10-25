@@ -4,6 +4,7 @@ import Char
 import Expect
 import Fuzz exposing (..)
 import Random.Pcg as Random
+import Regex
 import Shrink
 import String
 import String exposing (uncons)
@@ -27,8 +28,11 @@ camelizeTest =
         , fuzz string "It is the same lowercased string after removing the dashes and spaces" <|
             \s ->
                 let
-                    expected =
-                        replace "-" "" >> replace "_" "" >> replace " " "" >> String.toLower
+                    expected = replace "-" ""
+                        >> replace "_" ""
+                        >> replace " " ""
+                        >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> "")
+                        >> String.toLower
                 in
                     camelize s
                         |> String.toLower
