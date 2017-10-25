@@ -25,7 +25,7 @@ before_install:
     fi
 
 install:
-  - npm install -g elm elm-test@0.18.6
+  - npm install
 
 
 before_script:
@@ -33,4 +33,4 @@ before_script:
   - cd tests && $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-make --yes *.elm && cd ..
 
 script:
-  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 elm-test
+  - $TRAVIS_BUILD_DIR/sysconfcpus/bin/sysconfcpus -n 2 npm run test

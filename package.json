@@ -1,7 +1,7 @@
 {
   "name": "string-extra",
-  "version": "1.0.0",
-  "description": "string-extra ============",
+  "version": "1.4.0",
+  "description": "String helper functions for Elm",
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/elm-community/string-extra#readme",
   "dependencies": {
+    "elm": "^0.18.0",
     "elm-test": "^0.18.9"
   }
 }
