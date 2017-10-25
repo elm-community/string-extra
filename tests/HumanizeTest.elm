@@ -57,8 +57,7 @@ humanizeTest =
             \s ->
                 let
                     expected =
-                        replace " " ""
-                            >> replace "-" ""
+                        replace "-" ""
                             >> replace "_" ""
                             >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> "")
                             >> String.toLower

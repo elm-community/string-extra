@@ -30,7 +30,6 @@ camelizeTest =
                 let
                     expected = replace "-" ""
                         >> replace "_" ""
-                        >> replace " " ""
                         >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> "")
                         >> String.toLower
                 in
