@@ -265,6 +265,20 @@ isBlankTest =
         ]
 
 
+nonBlankTest : Test
+nonBlankTest =
+    describe "nonBlank"
+        [ test "Returns Nothing if the given string is blank" <|
+            \_ ->
+                nonBlank ""
+                    |> Expect.equal Nothing
+        , test "Returns just the string if the given string is not blank" <|
+            \_ ->
+                nonBlank " Slartibartfast"
+                    |> Expect.equal (Just " Slartibartfast")
+        ]
+
+
 surroundTest : Test
 surroundTest =
     describe "surround"
