@@ -110,8 +110,9 @@ import Bitwise
 import Char exposing (toLower, toUpper)
 import List
 import Maybe exposing (Maybe(..))
-import Regex exposing (HowMany(..), escape, regex)
+import Regex exposing (Regex)
 import String exposing (cons, join, uncons, words)
+import Tuple
 
 
 {-| Change the case of the first letter of a string to either uppercase or
@@ -157,11 +158,11 @@ toTitleCase : String -> String
 toTitleCase ws =
     let
         uppercaseMatch =
-            Regex.replace All (regex "\\w+") (.match >> toSentenceCase)
+            Regex.replace (regexFromString "\\w+") (.match >> toSentenceCase)
     in
     ws
-        |> Regex.replace All
-            (regex "^([a-z])|\\s+([a-z])")
+        |> Regex.replace
+            (regexFromString "^([a-z])|\\s+([a-z])")
             (.match >> uppercaseMatch)
 
 
@@ -173,7 +174,7 @@ toTitleCase ws =
 replace : String -> String -> String -> String
 replace search substitution string =
     string
-        |> Regex.replace All (regex (escape search)) (\_ -> substitution)
+        |> Regex.replace (regexFromString (regexEscape search)) (\_ -> substitution)
 
 
 {-| Replace text within a portion of a string given a substitution
@@ -240,13 +241,13 @@ softBreak width string =
 
     else
         string
-            |> Regex.find All (softBreakRegexp width)
+            |> Regex.find (softBreakRegexp width)
             |> List.map .match
 
 
 softBreakRegexp : Int -> Regex.Regex
 softBreakRegexp width =
-    regex <| ".{1," ++ toString width ++ "}(\\s+|$)|\\S+?(\\s+|$)"
+    regexFromString <| ".{1," ++ String.fromInt width ++ "}(\\s+|$)|\\S+?(\\s+|$)"
 
 
 {-| Trim the whitespace of both sides of the string and compress
@@ -258,7 +259,7 @@ repeated whitespace internally to a single whitespace char.
 clean : String -> String
 clean string =
     string
-        |> Regex.replace All (regex "\\s\\s+") (always " ")
+        |> Regex.replace (regexFromString "\\s\\s+") (always " ")
         |> String.trim
 
 
@@ -272,7 +273,7 @@ clean string =
 -}
 isBlank : String -> Bool
 isBlank string =
-    Regex.contains (regex "^\\s*$") string
+    Regex.contains (regexFromString "^\\s*$") string
 
 
 {-| Convert an underscored or dasherized string to a camelized one.
@@ -282,8 +283,8 @@ isBlank string =
 -}
 camelize : String -> String
 camelize string =
-    Regex.replace All
-        (regex "[-_\\s]+(.)?")
+    Regex.replace
+        (regexFromString "[-_\\s]+(.)?")
         (\{ submatches } ->
             case submatches of
                 (Just match) :: _ ->
@@ -305,7 +306,7 @@ All non-word characters will be stripped out of the original string.
 classify : String -> String
 classify string =
     string
-        |> Regex.replace All (regex "[\\W_]") (always " ")
+        |> Regex.replace (regexFromString "[\\W_]") (always " ")
         |> camelize
         |> replace " " ""
         |> toSentenceCase
@@ -317,8 +318,8 @@ classify string =
 
 -}
 surround : String -> String -> String
-surround wrap string =
-    wrap ++ string ++ wrap
+surround wrapper string =
+    wrapper ++ string ++ wrapper
 
 
 {-| Remove surrounding strings from another string.
@@ -327,11 +328,11 @@ surround wrap string =
 
 -}
 unsurround : String -> String -> String
-unsurround wrap string =
-    if String.startsWith wrap string && String.endsWith wrap string then
+unsurround wrapper string =
+    if String.startsWith wrapper string && String.endsWith wrapper string then
         let
             length =
-                String.length wrap
+                String.length wrapper
         in
         string
             |> String.dropLeft length
@@ -375,8 +376,8 @@ underscored : String -> String
 underscored string =
     string
         |> String.trim
-        |> Regex.replace All (regex "([a-z\\d])([A-Z]+)") (.submatches >> List.filterMap identity >> String.join "_")
-        |> Regex.replace All (regex "[_-\\s]+") (always "_")
+        |> Regex.replace (regexFromString "([a-z\\d])([A-Z]+)") (.submatches >> List.filterMap identity >> String.join "_")
+        |> Regex.replace (regexFromString "[_-\\s]+") (always "_")
         |> String.toLower
 
 
@@ -393,8 +394,8 @@ dasherize : String -> String
 dasherize string =
     string
         |> String.trim
-        |> Regex.replace All (regex "([A-Z])") (.match >> String.append "-")
-        |> Regex.replace All (regex "[_-\\s]+") (always "-")
+        |> Regex.replace (regexFromString "([A-Z])") (.match >> String.append "-")
+        |> Regex.replace (regexFromString "[_-\\s]+") (always "-")
         |> String.toLower
 
 
@@ -466,8 +467,8 @@ postfix '_id'. The first character will be capitalized.
 humanize : String -> String
 humanize string =
     string
-        |> Regex.replace All (regex "[A-Z]") (.match >> String.append "-")
-        |> Regex.replace All (regex "_id$|[-_\\s]+") (always " ")
+        |> Regex.replace (regexFromString "[A-Z]") (.match >> String.append "-")
+        |> Regex.replace (regexFromString "_id$|[-_\\s]+") (always " ")
         |> String.trim
         |> String.toLower
         |> toSentenceCase
@@ -601,10 +602,10 @@ softEllipsis howLong string =
 
     else
         string
-            |> Regex.find (AtMost 1) (softBreakRegexp howLong)
+            |> Regex.findAtMost 1 (softBreakRegexp howLong)
             |> List.map .match
             |> String.join ""
-            |> Regex.replace All (regex "([\\.,;:\\s])+$") (always "")
+            |> Regex.replace (regexFromString "([\\.,;:\\s])+$") (always "")
             |> (\a -> String.append a "...")
 
 
@@ -679,7 +680,7 @@ toSentenceHelper lastPart sentence list =
 stripTags : String -> String
 stripTags string =
     string
-        |> Regex.replace All (regex "<\\/?[^>]+>") (always "")
+        |> Regex.replace (regexFromString "<\\/?[^>]+>") (always "")
 
 
 {-| Given a number, a singular string, and a plural string, return the number
@@ -691,13 +692,13 @@ or the plural string otherwise.
     pluralize "elf" "elves" 0 == "0 elves"
 
 -}
-pluralize : String -> String -> number -> String
+pluralize : String -> String -> Int -> String
 pluralize singular plural count =
     if count == 1 then
         "1 " ++ singular
 
     else
-        toString count ++ " " ++ plural
+        String.fromInt count ++ " " ++ plural
 
 
 {-| Search a string from left to right for a pattern and return a substring
@@ -709,7 +710,7 @@ consisting of the characters in the string that are to the right of the pattern.
 rightOf : String -> String -> String
 rightOf pattern string =
     string
-        |> Regex.find (AtMost 1) (regex <| escape pattern ++ "(.*)$")
+        |> Regex.findAtMost 1 (regexFromString <| regexEscape pattern ++ "(.*)$")
         |> List.map (.submatches >> firstResult)
         |> String.join ""
 
@@ -723,7 +724,7 @@ consisting of the characters in the string that are to the left of the pattern.
 leftOf : String -> String -> String
 leftOf pattern string =
     string
-        |> Regex.find (AtMost 1) (regex <| "^(.*?)" ++ escape pattern)
+        |> Regex.findAtMost 1 (regexFromString <| "^(.*?)" ++ regexEscape pattern)
         |> List.map (.submatches >> firstResult)
         |> String.join ""
 
@@ -786,7 +787,7 @@ so if you accidentally pass it something other than an `Int`, you get an error.
 -}
 fromInt : Int -> String
 fromInt =
-    toString
+    String.fromInt
 
 
 {-| Turn a floating-point number into a string.
@@ -797,7 +798,7 @@ so if you accidentally pass it something other than a `Float`, you get an error.
 -}
 fromFloat : Float -> String
 fromFloat =
-    toString
+    String.fromFloat
 
 
 {-| Code point of Unicode character to use to indicate an 'unknown or
@@ -1029,7 +1030,7 @@ removeAccents string =
     else
         let
             do_regex_to_remove_acents ( regex, replace_character ) =
-                Regex.replace Regex.All regex (\_ -> replace_character)
+                Regex.replace regex (\_ -> replace_character)
         in
         List.foldl do_regex_to_remove_acents string accentRegex
 
@@ -1059,4 +1060,14 @@ accentRegex =
             , ( "Ý", "Y" )
             ]
     in
-    List.map (\( rule, char ) -> ( Regex.regex rule, char )) matches
+    List.map (Tuple.mapFirst regexFromString) matches
+
+
+regexEscape : String -> String
+regexEscape =
+    Regex.replace (regexFromString "[-/\\^$*+?.()|[\\]{}]") (\{ match } -> "\\" ++ match)
+
+
+regexFromString : String -> Regex
+regexFromString =
+    Regex.fromString >> Maybe.withDefault Regex.never
