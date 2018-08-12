@@ -62,7 +62,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Replace and Splice
 
-@docs replace, replaceSlice, insertAt, clean, nonEmpty, nonBlank, removeAccents
+@docs replace, replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
 
 
 ## Splitting
