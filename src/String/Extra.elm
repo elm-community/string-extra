@@ -10,8 +10,6 @@ module String.Extra
         , ellipsis
         , ellipsisWith
         , fromCodePoints
-        , fromFloat
-        , fromInt
         , humanize
         , insertAt
         , isBlank
@@ -93,11 +91,6 @@ Functions borrowed from the Rails Inflector class
 ## Finding
 
 @docs rightOf, leftOf, rightOfBack, leftOfBack
-
-
-## Converting Numbers
-
-@docs fromInt, fromFloat
 
 
 ## Converting UTF-32
@@ -777,28 +770,6 @@ leftOfBack pattern string =
         |> List.head
         |> Maybe.map (\a -> String.left a string)
         |> Maybe.withDefault ""
-
-
-{-| Turn an integer into a string.
-
-This works the same way as `Basics.toString` except its type is restricted,
-so if you accidentally pass it something other than an `Int`, you get an error.
-
--}
-fromInt : Int -> String
-fromInt =
-    String.fromInt
-
-
-{-| Turn a floating-point number into a string.
-
-This works the same way as `Basics.toString` except its type is restricted,
-so if you accidentally pass it something other than a `Float`, you get an error.
-
--}
-fromFloat : Float -> String
-fromFloat =
-    String.fromFloat
 
 
 {-| Convert a string into a list of UTF-32 code points.
