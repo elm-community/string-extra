@@ -3,7 +3,7 @@
     "name": "elm-community/string-extra",
     "summary": "String helper functions for Elm",
     "license": "BSD-3-Clause",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "exposed-modules": [
         "String.Extra"
     ],
