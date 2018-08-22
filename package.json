@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/elm-community/string-extra#readme",
   "dependencies": {
-    "elm": "^0.18.0",
-    "elm-test": "^0.18.9"
+    "elm": "^0.19.0",
+    "elm-test": "^0.19.0-beta4"
   }
 }
