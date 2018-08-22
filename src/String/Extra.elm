@@ -801,15 +801,6 @@ fromFloat =
     String.fromFloat
 
 
-{-| Code point of Unicode character to use to indicate an 'unknown or
-unrepresentable character'
-(<https://en.wikipedia.org/wiki/Specials_(Unicode_block)>)
--}
-replacementCodePoint : Int
-replacementCodePoint =
-    0xFFFD
-
-
 {-| Convert a string into a list of UTF-32 code points.
 
     toCodePoints "abc" == [ 97, 98, 99 ]
