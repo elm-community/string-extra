@@ -360,9 +360,9 @@ unquote string =
 Any sequence of spaces or dashes will also be converted to a single underscore.
 The final string will be lowercased.
 
-    underscore "SomeClassName" == "some_class_name"
-    underscore "some-class-name" == "some_class_name"
-    underscore "SomeClass name" == "some_class_name
+    underscored "SomeClassName" == "some_class_name"
+    underscored "some-class-name" == "some_class_name"
+    underscored "SomeClass name" == "some_class_name
 
 -}
 underscored : String -> String
