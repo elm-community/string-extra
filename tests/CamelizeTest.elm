@@ -7,7 +7,7 @@ import Random.Pcg as Random
 import Regex
 import Shrink
 import String
-import String exposing (uncons)
+import String exposing (uncons, replace)
 import String.Extra exposing (..)
 import Test exposing (..)
 
