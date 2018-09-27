@@ -3,7 +3,7 @@ module Tests exposing (..)
 import Expect
 import Fuzz exposing (..)
 import Json.Encode exposing (Value)
-import String exposing (uncons, fromChar, toUpper, toLower)
+import String exposing (uncons, fromChar, toUpper, toLower, replace)
 import String.Extra exposing (..)
 import Test exposing (..)
 import Tuple exposing (first, second)
@@ -114,26 +114,6 @@ toTitleCaseTest =
                             |> String.length
                 in
                     Expect.equal expected result
-        ]
-
-
-replaceTest : Test
-replaceTest =
-    describe "replace"
-        [ fuzz2 string string "It substitutes all occurences of the same sequence" <|
-            \string substitute ->
-                replace string substitute string
-                    |> Expect.equal substitute
-        , fuzz string "It substitutes multiple occurances" <|
-            \string ->
-                replace "a" "b" string
-                    |> String.contains "a"
-                    |> Expect.false "Given string should not contain any 'a'"
-        , test "It should replace special characters" <|
-            \_ ->
-                replace "\\" "deepthought" "this is a special string \\"
-                    |> String.contains "deepthought"
-                    |> Expect.true "String should contain deepthought"
         ]
 
 

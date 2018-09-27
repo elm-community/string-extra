@@ -5,7 +5,7 @@ import Expect
 import Fuzz exposing (..)
 import Random.Pcg as Random
 import Shrink
-import String exposing (uncons)
+import String exposing (uncons, replace)
 import String.Extra exposing (..)
 import Test exposing (..)
 

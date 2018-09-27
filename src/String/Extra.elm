@@ -20,7 +20,6 @@ module String.Extra
         , pluralize
         , quote
         , removeAccents
-        , replace
         , replaceSlice
         , rightOf
         , rightOfBack
@@ -60,7 +59,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Replace and Splice
 
-@docs replace, replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
+@docs replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
 
 
 ## Splitting
@@ -157,17 +156,6 @@ toTitleCase ws =
         |> Regex.replace
             (regexFromString "^([a-z])|\\s+([a-z])")
             (.match >> uppercaseMatch)
-
-
-{-| Replace all occurrences of the search string with the substitution string.
-
-    replace "Mary" "Sue" "Hello, Mary" == "Hello, Sue"
-
--}
-replace : String -> String -> String -> String
-replace search substitution string =
-    string
-        |> Regex.replace (regexFromString (regexEscape search)) (\_ -> substitution)
 
 
 {-| Replace text within a portion of a string given a substitution
@@ -301,7 +289,7 @@ classify string =
     string
         |> Regex.replace (regexFromString "[\\W_]") (always " ")
         |> camelize
-        |> replace " " ""
+        |> String.replace " " ""
         |> toSentenceCase
 
 

@@ -45,8 +45,8 @@ humanizeTest =
                     expected =
                         String.toLower
                             >> Regex.replace (Regex.AtMost 1) (Regex.regex "_id$") (\_ -> "")
-                            >> replace "-" " "
-                            >> replace "_" " "
+                            >> String.replace "-" " "
+                            >> String.replace "_" " "
                             >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> " ")
                             >> String.trim
                 in
@@ -57,13 +57,13 @@ humanizeTest =
             \s ->
                 let
                     expected =
-                        replace "-" ""
-                            >> replace "_" ""
+                        String.replace "-" ""
+                            >> String.replace "_" ""
                             >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> "")
                             >> String.toLower
                 in
                     humanize s
-                        |> replace " " ""
+                        |> String.replace " " ""
                         |> String.toLower
                         |> Expect.equal (expected s)
         , fuzz (validWords []) "It adds a space before each uppercase letter" <|
