@@ -21,6 +21,7 @@ module String.Extra
         , quote
         , removeAccents
         , replaceSlice
+        , fillPlaceholders
         , rightOf
         , rightOfBack
         , softBreak
@@ -59,7 +60,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Replace and Splice
 
-@docs replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
+@docs fillPlaceholders, replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
 
 
 ## Splitting
@@ -156,6 +157,69 @@ toTitleCase ws =
         |> Regex.replace
             (regexFromString "^([a-z])|\\s+([a-z])")
             (.match >> uppercaseMatch)
+
+
+{-| Fill placeholders in a string by supplying a list of key-value tuples.
+
+    fillPlaceholders
+        [ ( "page", "2" )
+        , ( "total", "100" )
+        ]
+        "Page {{ page }} of {{ total }}"
+
+    == "Page 2 of 100"
+
+Keys are case insensitive which means the following will also work:
+
+    fillPlaceholders
+        [ ( "PAGE", "2" )
+        , ( "TOTAL", "100" )
+        ]
+        "Page {{ page }} of {{ total }}"
+
+Keys must only contain alphanumeric characters, underscore or dash
+
+-}
+fillPlaceholders : List (String, String) -> String -> String
+fillPlaceholders placeholders inputString =
+    let
+        findPlaceholder : String -> Maybe String
+        findPlaceholder =
+            List.map (Tuple.mapFirst String.toLower) placeholders
+                |> findInList
+    in
+    inputString
+        |> Regex.replace fillPlaceholdersRegex
+            (\ match ->
+                match.submatches
+                    |> Maybe.withDefault Nothing << List.head
+                    |> Maybe.map String.toLower
+                    |> Maybe.andThen findPlaceholder
+                    |> Maybe.withDefault match.match
+            )
+
+
+fillPlaceholdersRegex : Regex
+fillPlaceholdersRegex =
+    Regex.fromStringWith
+        { caseInsensitive = False
+        , multiline = True
+        }
+        "{{\\s*([\\w\\-]+)\\s*}}"
+        |> Maybe.withDefault Regex.never
+
+
+findInList : List (String, String) -> String -> Maybe String
+findInList values key =
+    case values of
+        [] ->
+            Nothing
+
+        (k, v)::rest ->
+            if k == key then
+                Just v
+            else
+                findInList rest key
 
 
 {-| Replace text within a portion of a string given a substitution
