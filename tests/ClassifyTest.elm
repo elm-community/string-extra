@@ -3,11 +3,10 @@ module ClassifyTest exposing (classifyTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random.Pcg as Random
+import Random
 import Regex
 import Shrink
-import String
-import String exposing (uncons, replace)
+import String exposing (replace, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
 import Tuple exposing (first, second)
@@ -19,7 +18,7 @@ classifyTest =
         [ fuzz string "It does not contain non-word characters" <|
             \string ->
                 classify string
-                    |> Regex.contains (Regex.regex "[\\W]")
+                    |> Regex.contains (Regex.fromString "[\\W]" |> Maybe.withDefault Regex.never)
                     |> Expect.false "Non word characters detected"
         , fuzz (latinWords 1 10) "It starts with an uppercase letter" <|
             \string ->
@@ -40,17 +39,25 @@ classifyTest =
 
 charGenerator : Random.Generator Char
 charGenerator =
-    Random.choices latinChars
+    Random.uniform latinChar1 [ latinChar2 ]
+        |> Random.andThen identity
 
 
 validCharGenerator : Random.Generator Char
 validCharGenerator =
-    Random.choices <| latinChars ++ [ Random.map Char.fromCode (Random.int 45 46), Random.constant (Char.fromCode 95) ]
+    Random.andThen identity <|
+        Random.uniform latinChar1 <|
+            [ latinChar2, Random.map Char.fromCode (Random.int 45 46), Random.constant (Char.fromCode 95) ]
 
 
-latinChars : List (Random.Generator Char)
-latinChars =
-    [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+latinChar1 : Random.Generator Char
+latinChar1 =
+    Random.map Char.fromCode (Random.int 97 122)
+
+
+latinChar2 : Random.Generator Char
+latinChar2 =
+    Random.map Char.fromCode (Random.int 65 90)
 
 
 latinWords : Int -> Int -> Fuzzer String
@@ -59,7 +66,7 @@ latinWords min max =
         producer =
             Random.int min max |> Random.andThen (\i -> Random.map String.fromList (Random.list i charGenerator))
     in
-        custom producer Shrink.string
+    custom producer Shrink.string
 
 
 validWords : Int -> Int -> Fuzzer String
@@ -68,4 +75,4 @@ validWords min max =
         producer =
             Random.int min max |> Random.andThen (\i -> Random.map String.fromList (Random.list i validCharGenerator))
     in
-        custom producer Shrink.string
+    custom producer Shrink.string

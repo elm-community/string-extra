@@ -1,46 +1,15 @@
-module String.Extra
-    exposing
-        ( break
-        , camelize
-        , classify
-        , clean
-        , countOccurrences
-        , dasherize
-        , decapitalize
-        , ellipsis
-        , ellipsisWith
-        , fromCodePoints
-        , humanize
-        , insertAt
-        , isBlank
-        , leftOf
-        , leftOfBack
-        , nonBlank
-        , nonEmpty
-        , pluralize
-        , quote
-        , removeAccents
-        , replaceSlice
-        , rightOf
-        , rightOfBack
-        , softBreak
-        , softEllipsis
-        , softWrap
-        , softWrapWith
-        , stripTags
-        , surround
-        , toCodePoints
-        , toSentence
-        , toSentenceCase
-        , toSentenceOxford
-        , toTitleCase
-        , underscored
-        , unindent
-        , unquote
-        , unsurround
-        , wrap
-        , wrapWith
-        )
+module String.Extra exposing
+    ( toSentenceCase, toTitleCase, decapitalize
+    , camelize, classify, underscored, dasherize, humanize
+    , replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
+    , break, softBreak
+    , wrap, wrapWith, softWrap, softWrapWith, quote, surround
+    , isBlank, countOccurrences
+    , clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags, pluralize
+    , toSentence, toSentenceOxford
+    , rightOf, leftOf, rightOfBack, leftOfBack
+    , toCodePoints, fromCodePoints
+    )
 
 {-| Additional functions for working with Strings
 
@@ -121,6 +90,7 @@ changeCase mutator word =
 {-| Capitalize the first letter of a string.
 
     toSentenceCase "this is a phrase" == "This is a phrase"
+
     toSentenceCase "hello, world" == "Hello, world"
 
 -}
@@ -132,6 +102,7 @@ toSentenceCase word =
 {-| Decapitalize the first letter of a string.
 
     decapitalize "This is a phrase" == "this is a phrase"
+
     decapitalize "Hello, World" == "hello, World"
 
 -}
@@ -143,6 +114,7 @@ decapitalize word =
 {-| Capitalize the first character of each word in a string.
 
     toTitleCase "this is a phrase" == "This Is A Phrase"
+
     toTitleCase "hello, world" == "Hello, World"
 
 -}
@@ -163,8 +135,10 @@ string, a start index and an end index. The substitution includes the character
 at the start index but not the one at the end index.
 
     replaceSlice "Sue" 4 7 "Hi, Bob" == "Hi, Sue"
-    replaceSlice "elephants" 0  6 "snakes on a plane!" == "elephants on a plane!"
-    replaceSlice "under" 7  9 "snakes on a plane!" == "snakes under a plane!"
+
+    replaceSlice "elephants" 0 6 "snakes on a plane!" == "elephants on a plane!"
+
+    replaceSlice "under" 7 9 "snakes on a plane!" == "snakes under a plane!"
 
 -}
 replaceSlice : String -> Int -> Int -> String -> String
@@ -184,8 +158,9 @@ insertAt insert pos string =
 
 {-| Break a string into a list of strings of a specified maximum length.
 
-    break 10 "The quick brown fox" == ["The quick ", "brown fox"]
-    break 2 "" == [""]
+    break 10 "The quick brown fox" == [ "The quick ", "brown fox" ]
+
+    break 2 "" == [ "" ]
 
 -}
 break : Int -> String -> List String
@@ -212,7 +187,7 @@ breaker width string acc =
 {-| Break a string into a list of strings of a specified maximum length,
 without truncating words.
 
-    softBreak 6 "The quick brown fox" == ["The quick", " brown", " fox"]
+    softBreak 6 "The quick brown fox" == [ "The quick", " brown", " fox" ]
 
 -}
 softBreak : Int -> String -> List String
@@ -247,8 +222,11 @@ clean string =
 {-| Test if a string is empty or only contains whitespace.
 
     isBlank "" == True
+
     isBlank "\n" == True
+
     isBlank "  " == True
+
     isBlank " a" == False
 
 -}
@@ -281,6 +259,7 @@ camelize string =
 All non-word characters will be stripped out of the original string.
 
     classify "some_class_name" == "SomeClassName"
+
     classify "myLittleCamel.class.name" == "MyLittleCamelClassName"
 
 -}
@@ -336,6 +315,7 @@ quote string =
 {-| Remove quotes that surround a string.
 
     unquote "\"foo\"" == "foo"
+
     unquote "\"foo\"bar\""
 
 -}
@@ -385,6 +365,7 @@ dasherize string =
 Look at `wrap` if you just want to wrap using newlines.
 
     wrapWith 7 "\n" "My very long text" === "My very\nlong text"
+
     wrapWith 100 "\n" "Too short" === "Too short"
 
 -}
@@ -399,6 +380,7 @@ wrapWith width separator string =
 new line.
 
     wrap 7 "My very long text" === "My very\nlong te\nxt"
+
     wrap 100 "Too short" === "Too short"
 
 -}
@@ -411,7 +393,9 @@ wrap width string =
 and then separate them using a new line.
 
     softWrap 7 "My very long text" === "My very\nlong text"
+
     softWrap 3 "Hello World" === "Hello \nWorld"
+
     softWrap 100 "Too short" === "Too short"
 
 -}
@@ -424,7 +408,9 @@ softWrap width string =
 and then separate them using the given separator.
 
     softWrapWith 7 "..." "My very long text" === "My very...long text"
+
     softWrapWith 3 "\n" "Hello World" === "Hello \nWorld"
+
     softWrapWith 100 "\t" "Too short" === "Too short"
 
 -}
@@ -437,7 +423,7 @@ softWrapWith width separator string =
 
 {-| Convert an underscored, camelized, or dasherized string into one that can be
 read by humans. Also remove beginning and ending whitespace, and removes the
-postfix '_id'. The first character will be capitalized.
+postfix '\_id'. The first character will be capitalized.
 
     humanize "this_is_great" == "This is great"
     humanize "ThisIsGreat" = "This is great"
@@ -461,6 +447,7 @@ leading spaces nor tabs and the rest of the lines will have the same
 amount of indentation removed.
 
     unindent "  Hello\n    World " == "Hello\n  World"
+
     unindent "\t\tHello\n\t\t\t\tWorld" == "Hello\n\t\tWorld"
 
 -}
@@ -504,6 +491,7 @@ unindent multilineSting =
 {-| Return the number of occurrences of a substring in another string.
 
     countOccurrences "Hello" "Hello World" == 1
+
     countOccurrences "o" "Hello World" == 2
 
 -}
@@ -526,8 +514,11 @@ specified length.
 The resulting string will have at most the specified length.
 
     ellipsisWith 5 " .." "Hello World" == "He .."
-    ellipsisWith 10 " .."  "Hello World" == "Hello W .."
+
+    ellipsisWith 10 " .." "Hello World" == "Hello W .."
+
     ellipsisWith 10 " .." "Hello" == "Hello"
+
     ellipsisWith 8 " .." "Hello World" == "Hello .."
 
 -}
@@ -548,8 +539,11 @@ specified length.
 The resulting string will have at most the specified length.
 
     ellipsis 5 "Hello World" == "He..."
+
     ellipsis 10 "Hello World" == "Hello W..."
+
     ellipsis 10 "Hello" == "Hello"
+
     ellipsis 8 "Hello World" == "Hello..."
 
 -}
@@ -570,9 +564,13 @@ addition, it removes trailing whitespace and punctuation characters at
 the end of the truncated string.
 
     softEllipsis 1 "Hello, World" == "Hello..."
+
     softEllipsis 5 "Hello, World" == "Hello..."
+
     softEllipsis 6 "Hello, World" == "Hello..."
+
     softEllipsis 15 "Hello, cruel world" == "Hello, cruel..."
+
     softEllipsis 10 "Hello" == "Hello"
 
 -}
@@ -593,9 +591,12 @@ softEllipsis howLong string =
 {-| Convert a list of strings into a human-readable list.
 
     toSentence [] == ""
-    toSentence ["lions"] == "lions"
-    toSentence ["lions", "tigers"] == "lions and tigers"
-    toSentence ["lions", "tigers", "bears"] == "lions, tigers and bears"
+
+    toSentence [ "lions" ] == "lions"
+
+    toSentence [ "lions", "tigers" ] == "lions and tigers"
+
+    toSentence [ "lions", "tigers", "bears" ] == "lions, tigers and bears"
 
 -}
 toSentence : List String -> String
@@ -611,9 +612,12 @@ toSentence list =
 {-| Convert a list of strings into a human-readable list using an oxford comma.
 
     toSentenceOxford [] == ""
-    toSentenceOxford ["lions"] == "lions"
-    toSentenceOxford ["lions", "tigers"] == "lions and tigers"
-    toSentenceOxford ["lions", "tigers", "bears"] == "lions, tigers, and bears"
+
+    toSentenceOxford [ "lions" ] == "lions"
+
+    toSentenceOxford [ "lions", "tigers" ] == "lions and tigers"
+
+    toSentenceOxford [ "lions", "tigers", "bears" ] == "lions, tigers, and bears"
 
 -}
 toSentenceOxford : List String -> String
@@ -669,7 +673,9 @@ followed by a space, followed by either the singular string if the number was 1,
 or the plural string otherwise.
 
     pluralize "elf" "elves" 2 == "2 elves"
+
     pluralize "elf" "elves" 1 == "1 elf"
+
     pluralize "elf" "elves" 0 == "0 elves"
 
 -}
@@ -763,7 +769,9 @@ leftOfBack pattern string =
 {-| Convert a string into a list of UTF-32 code points.
 
     toCodePoints "abc" == [ 97, 98, 99 ]
+
     toCodePoints "©§π" == [ 169, 167, 960 ]
+
     toCodePoints "💩!" == [ 128169, 33 ]
 
 Note that code points do not necessarily correspond to logical/visual
@@ -785,7 +793,9 @@ toCodePoints string =
 `toCodePoints`.
 
     fromCodePoints [ 97, 98, 99 ] == "abc"
+
     fromCodePoints [ 169, 167, 960 ] == "©§π"
+
     fromCodePoints [ 128169, 33 ] == "💩!"
 
 `fromCodePoints codePoints` is equivalent to:
@@ -801,6 +811,7 @@ fromCodePoints codePoints =
 {-| Convert a string to a Nothing when empty.
 
     nonEmpty "" == Nothing
+
     nonEmpty "Hello world" == Just "Hello world"
 
 -}
@@ -816,6 +827,7 @@ nonEmpty string =
 {-| Convert a string to a Nothing when blank.
 
     nonBlank "" == Nothing
+
     nonBlank "Hello world" == Just "Hello world"
 
 -}
@@ -831,6 +843,7 @@ nonBlank string =
 {-| Remove accents from string.
 
     removeAccents "andré" == "andre"
+
     removeAccents "Atenção" == "Atencao"
 
 -}

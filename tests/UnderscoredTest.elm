@@ -3,9 +3,9 @@ module UnderscoredTest exposing (underscoredTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random.Pcg as Random
+import Random
 import Shrink
-import String exposing (uncons, replace)
+import String exposing (replace, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
 
@@ -30,8 +30,8 @@ underscoredTest =
                             >> replace "__" "_"
                             >> replace "__" "_"
                 in
-                    underscored (String.toLower s)
-                        |> Expect.equal (expected s)
+                underscored (String.toLower s)
+                    |> Expect.equal (expected s)
         , fuzz
             nonEmptyString
             "It puts an underscore before each uppercase characters group unless it starts with uppercase"
@@ -44,7 +44,10 @@ underscoredTest =
 
 char : Random.Generator Char
 char =
-    Random.choices [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+    --Random.uniform (Random.map Char.fromCode (Random.int 97 122)) [ Random.map Char.fromCode (Random.int 65 90) ]
+    Random.uniform ( 97, 122 ) [ ( 65, 90 ) ]
+        |> Random.andThen (\( a, b ) -> Random.int a b)
+        |> Random.map Char.fromCode
 
 
 nonEmptyString : Fuzzer String
@@ -53,43 +56,46 @@ nonEmptyString =
         producer =
             Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i char))
     in
-        custom producer Shrink.string
+    custom producer Shrink.string
 
 
 replaceUppercase : String -> String
 replaceUppercase string =
     string
         |> String.toList
-        |> List.indexedMap (,)
+        |> List.indexedMap Tuple.pair
         |> List.foldr recordUpperCasePositions []
         |> List.foldl reduceList []
         |> List.foldl replacePositions string
 
 
 recordUpperCasePositions : ( Int, Char ) -> List ( Int, Char ) -> List ( Int, Char )
-recordUpperCasePositions ( index, char ) acc =
-    if Char.isUpper char then
-        ( index, char ) :: acc
+recordUpperCasePositions ( index, char_ ) acc =
+    if Char.isUpper char_ then
+        ( index, char_ ) :: acc
+
     else
         acc
 
 
 reduceList : ( Int, Char ) -> List ( Int, Int, Char ) -> List ( Int, Int, Char )
-reduceList ( index, char ) acc =
+reduceList ( index, char_ ) acc =
     case acc of
         ( start, end, c ) :: rest ->
             if index == end + 1 then
                 ( start, index, c ) :: rest
+
             else
-                ( index, index, char ) :: acc
+                ( index, index, char_ ) :: acc
 
         [] ->
-            ( index, index, char ) :: acc
+            ( index, index, char_ ) :: acc
 
 
 replacePositions : ( Int, Int, Char ) -> String -> String
 replacePositions ( start, _, c ) string =
     if start == 0 then
         string
+
     else
-        replaceSlice ("_" ++ (String.fromChar c)) start (start + 1) string
+        replaceSlice ("_" ++ String.fromChar c) start (start + 1) string

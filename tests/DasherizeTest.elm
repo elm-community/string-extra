@@ -3,9 +3,9 @@ module DasherizeTest exposing (dasherizeTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random.Pcg as Random
+import Random
 import Shrink
-import String exposing (uncons, replace)
+import String exposing (replace, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
 
@@ -30,9 +30,9 @@ dasherizeTest =
                             >> replace "--" "-"
                             >> replace "--" "-"
                 in
-                    dasherize (String.toLower s)
-                        |> String.toLower
-                        |> Expect.equal (expected s)
+                dasherize (String.toLower s)
+                    |> String.toLower
+                    |> Expect.equal (expected s)
         , fuzz nonEmptyString "It puts dash before every single uppercase character" <|
             \s ->
                 dasherize s
@@ -42,7 +42,9 @@ dasherizeTest =
 
 char : Random.Generator Char
 char =
-    Random.choices [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
+    Random.uniform ( 97, 122 ) [ ( 65, 90 ) ]
+        |> Random.andThen (\( a, b ) -> Random.int a b)
+        |> Random.map Char.fromCode
 
 
 nonEmptyString : Fuzzer String
@@ -51,7 +53,7 @@ nonEmptyString =
         producer =
             Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i char))
     in
-        custom producer Shrink.string
+    custom producer Shrink.string
 
 
 replaceUppercase : String -> String
@@ -61,7 +63,8 @@ replaceUppercase string =
         |> List.map
             (\c ->
                 if Char.isUpper c then
-                    "-" ++ (String.fromChar c)
+                    "-" ++ String.fromChar c
+
                 else
                     String.fromChar c
             )
