@@ -67,12 +67,11 @@ Functions borrowed from the Rails Inflector class
 
 -}
 
-import Bitwise
 import Char exposing (toLower, toUpper)
 import List
 import Maybe exposing (Maybe(..))
 import Regex exposing (Regex)
-import String exposing (cons, join, uncons, words)
+import String exposing (cons, join, uncons)
 import Tuple
 
 

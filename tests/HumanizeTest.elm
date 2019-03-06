@@ -3,12 +3,11 @@ module HumanizeTest exposing (humanizeTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random
 import Regex
-import Shrink
 import String
 import String.Extra exposing (..)
 import Test exposing (..)
+import TestData
 import Tuple exposing (first, second)
 
 
@@ -98,26 +97,9 @@ idString =
         |> map (\s -> s ++ "s_id")
 
 
-withChar : List Char -> Random.Generator Char
-withChar ch =
-    Random.andThen identity <|
-        Random.uniform (Random.map Char.fromCode (Random.int 97 122)) <|
-            Random.map Char.fromCode (Random.int 65 90)
-                :: List.map Random.constant ch
-
-
 validWords : List Char -> Fuzzer String
 validWords ch =
-    let
-        producer =
-            Random.int 1 10
-                |> Random.andThen
-                    (\i ->
-                        Random.map String.fromList <|
-                            Random.list i (withChar ch)
-                    )
-    in
-    custom producer Shrink.noShrink
+    TestData.randomStringsWithChars ch
 
 
 replaceUppercase : String -> String

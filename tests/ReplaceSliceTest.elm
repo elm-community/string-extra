@@ -7,6 +7,7 @@ import Shrink
 import String
 import String.Extra exposing (..)
 import Test exposing (..)
+import TestData
 
 
 replaceSliceTest : Test
@@ -64,31 +65,11 @@ replaceSliceTest =
         ]
 
 
-withChar : List Char -> Random.Generator Char
-withChar ch =
-    Random.andThen identity <|
-        Random.uniform (Random.map Char.fromCode (Random.int 97 122)) <|
-            Random.map Char.fromCode (Random.int 65 90)
-                :: List.map Random.constant ch
-
-
-lowercaseLetter : Random.Generator Char
-lowercaseLetter =
-    Random.map (\n -> Char.fromCode (n + 97)) (Random.int 0 25)
-
-
-randomString : Random.Generator String
-randomString =
-    Random.int 1 1000
-        |> Random.andThen (\len -> Random.list len lowercaseLetter)
-        |> Random.map String.fromList
-
-
 replaceSliceProducer : Fuzzer ( ( String, String ), ( Int, Int ) )
 replaceSliceProducer =
     let
         producer =
-            Random.map2 Tuple.pair randomString randomString
+            Random.map2 Tuple.pair TestData.randomString TestData.randomString
                 |> Random.andThen (\( str, sub ) -> Random.pair (Random.constant ( str, sub )) (Random.int 0 <| String.length str))
                 |> Random.andThen (\( ( str, sub ), start ) -> Random.pair (Random.constant ( str, sub )) (Random.pair (Random.constant start) (Random.int start <| String.length str)))
     in

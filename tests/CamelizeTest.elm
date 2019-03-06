@@ -3,12 +3,11 @@ module CamelizeTest exposing (camelizeTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random
 import Regex
-import Shrink
 import String exposing (replace, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
+import TestData
 
 
 camelizeTest : Test
@@ -66,16 +65,6 @@ capitalizeOdds pos str =
         str
 
 
-withChar : Char -> Random.Generator Char
-withChar ch =
-    Random.uniform (Random.map Char.fromCode (Random.int 97 122)) [ Random.map Char.fromCode (Random.int 65 90), Random.constant ch ]
-        |> Random.andThen identity
-
-
 validWords : Char -> Fuzzer String
 validWords ch =
-    let
-        producer =
-            Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i (withChar ch)))
-    in
-    custom producer Shrink.string
+    TestData.randomStringsWithChars [ ch ]

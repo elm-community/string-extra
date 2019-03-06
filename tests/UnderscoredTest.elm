@@ -3,11 +3,10 @@ module UnderscoredTest exposing (underscoredTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random
-import Shrink
 import String exposing (replace, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
+import TestData
 
 
 underscoredTest : Test
@@ -32,31 +31,11 @@ underscoredTest =
                 in
                 underscored (String.toLower s)
                     |> Expect.equal (expected s)
-        , fuzz
-            nonEmptyString
-            "It puts an underscore before each uppercase characters group unless it starts with uppercase"
-          <|
+        , fuzz TestData.randomStrings "It puts an underscore before each uppercase characters group unless it starts with uppercase" <|
             \s ->
                 underscored s
                     |> Expect.equal (replaceUppercase s |> String.toLower)
         ]
-
-
-char : Random.Generator Char
-char =
-    --Random.uniform (Random.map Char.fromCode (Random.int 97 122)) [ Random.map Char.fromCode (Random.int 65 90) ]
-    Random.uniform ( 97, 122 ) [ ( 65, 90 ) ]
-        |> Random.andThen (\( a, b ) -> Random.int a b)
-        |> Random.map Char.fromCode
-
-
-nonEmptyString : Fuzzer String
-nonEmptyString =
-    let
-        producer =
-            Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i char))
-    in
-    custom producer Shrink.string
 
 
 replaceUppercase : String -> String
@@ -70,26 +49,26 @@ replaceUppercase string =
 
 
 recordUpperCasePositions : ( Int, Char ) -> List ( Int, Char ) -> List ( Int, Char )
-recordUpperCasePositions ( index, char_ ) acc =
-    if Char.isUpper char_ then
-        ( index, char_ ) :: acc
+recordUpperCasePositions ( index, char ) acc =
+    if Char.isUpper char then
+        ( index, char ) :: acc
 
     else
         acc
 
 
 reduceList : ( Int, Char ) -> List ( Int, Int, Char ) -> List ( Int, Int, Char )
-reduceList ( index, char_ ) acc =
+reduceList ( index, char ) acc =
     case acc of
         ( start, end, c ) :: rest ->
             if index == end + 1 then
                 ( start, index, c ) :: rest
 
             else
-                ( index, index, char_ ) :: acc
+                ( index, index, char ) :: acc
 
         [] ->
-            ( index, index, char_ ) :: acc
+            ( index, index, char ) :: acc
 
 
 replacePositions : ( Int, Int, Char ) -> String -> String
