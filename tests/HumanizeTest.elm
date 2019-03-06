@@ -14,7 +14,31 @@ import Tuple exposing (first, second)
 humanizeTest : Test
 humanizeTest =
     describe "humanize"
-        [ fuzz (validWords []) "It starts with an uppercase letter after trimming" <|
+        [ test "All uppercase" <|
+            \_ ->
+                humanize "ALL_UPPERCASE IS FINE"
+                    |> Expect.equal "All uppercase is fine"
+        , test "Some uppercase" <|
+            \_ ->
+                humanize "I like HTML"
+                    |> Expect.equal "I like html"
+        , test "Snake case" <|
+            \_ ->
+                humanize "this_is_great"
+                    |> Expect.equal "This is great"
+        , test "Capitalized" <|
+            \_ ->
+                humanize "ThisIsGreat"
+                    |> Expect.equal "This is great"
+        , test "Kebab case" <|
+            \_ ->
+                humanize "this-is-great"
+                    |> Expect.equal "This is great"
+        , test "Id suffix" <|
+            \_ ->
+                humanize "author_id"
+                    |> Expect.equal "Author"
+        , fuzz (validWords []) "It starts with an uppercase letter after trimming" <|
             \s ->
                 let
                     expected =
@@ -69,7 +93,9 @@ humanizeTest =
             \s ->
                 let
                     expected =
-                        replaceUppercase >> String.toLower >> String.trim
+                        Regex.replace (regex "[A-Z]+") (\{ match } -> " " ++ match)
+                            >> String.toLower
+                            >> String.trim
                 in
                 humanize s
                     |> String.toLower

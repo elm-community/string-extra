@@ -433,7 +433,7 @@ postfix '\_id'. The first character will be capitalized.
 humanize : String -> String
 humanize string =
     string
-        |> Regex.replace (regexFromString "[A-Z]") (.match >> String.append "-")
+        |> Regex.replace (regexFromString "[A-Z]+") (.match >> String.append "-")
         |> Regex.replace (regexFromString "_id$|[-_\\s]+") (always " ")
         |> String.trim
         |> String.toLower
