@@ -1,9 +1,9 @@
-module Tests exposing (..)
+module Tests exposing (breakTest, cleanTest, countOccurrencesTest, decapitalizeTest, ellipsisTest, insertAtProducer, insertAtTest, isBlankTest, nonBlankTest, pluralizeTest, softBreakTest, surroundTest, tail, toSentenceCaseTest, toTitleCaseTest, unquoteTest, wrapTest)
 
 import Expect
 import Fuzz exposing (..)
 import Json.Encode exposing (Value)
-import String exposing (uncons, fromChar, toUpper, toLower, replace)
+import String exposing (fromChar, replace, toLower, toUpper, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
 import Tuple exposing (first, second)
@@ -33,7 +33,7 @@ toSentenceCaseTest =
                             |> Maybe.map (first >> fromChar >> toUpper)
                             |> Maybe.withDefault ""
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         , fuzz string "The tail of the string remains untouched" <|
             \string ->
                 let
@@ -43,7 +43,7 @@ toSentenceCaseTest =
                     expected =
                         tail string
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         ]
 
 
@@ -66,7 +66,7 @@ decapitalizeTest =
                             |> Maybe.map (first >> fromChar >> toLower)
                             |> Maybe.withDefault ""
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         , fuzz string "It does not change the tail of the string" <|
             \string ->
                 let
@@ -76,7 +76,7 @@ decapitalizeTest =
                     expected =
                         tail string
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         ]
 
 
@@ -98,7 +98,7 @@ toTitleCaseTest =
                             |> String.words
                             |> List.map toSentenceCase
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         , fuzz (list string) "It does not change the length of the string" <|
             \strings ->
                 let
@@ -113,7 +113,7 @@ toTitleCaseTest =
                             |> String.join " "
                             |> String.length
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         ]
 
 
@@ -136,7 +136,7 @@ breakTest =
                     _ ->
                         break width string
                             |> List.length
-                            |> Expect.equal (ceiling <| ((toFloat << String.length) string) / toFloat width)
+                            |> Expect.equal (ceiling <| (toFloat << String.length) string / toFloat width)
         , fuzz2 string (intRange 1 10) "Concatenating the result yields the original string" <|
             \string width ->
                 break width string
@@ -145,7 +145,7 @@ breakTest =
         , fuzz2 string (intRange 1 10) "No element in the list should have more than `width` chars" <|
             \string width ->
                 break width string
-                    |> List.map (String.length)
+                    |> List.map String.length
                     |> List.filter ((<) width)
                     |> List.isEmpty
                     |> Expect.true "The list has some long elements"
@@ -182,7 +182,7 @@ cleanTest =
                     expected =
                         String.words string
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         , fuzz string "It trims the string on the left side" <|
             \string ->
                 string
@@ -211,7 +211,7 @@ insertAtTest =
             \( sub, at, string ) ->
                 insertAt sub at string
                     |> String.length
-                    |> Expect.equal ((String.length sub) + (String.length string))
+                    |> Expect.equal (String.length sub + String.length string)
         , fuzz insertAtProducer "Start of the string remains the same" <|
             \( sub, at, string ) ->
                 insertAt sub at string
@@ -220,7 +220,7 @@ insertAtTest =
         , fuzz insertAtProducer "End of the string remains the same" <|
             \( sub, at, string ) ->
                 insertAt sub at string
-                    |> String.slice (at + (String.length sub)) ((String.length string) + String.length sub)
+                    |> String.slice (at + String.length sub) (String.length string + String.length sub)
                     |> Expect.equal (String.slice at (String.length string) string)
         ]
 
@@ -287,9 +287,9 @@ surroundTest =
                         String.length (surround wrap string)
 
                     expected =
-                        (String.length string) + (2 * String.length wrap)
+                        String.length string + (2 * String.length wrap)
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         ]
 
 
@@ -308,12 +308,12 @@ countOccurrencesTest =
                         countOccurrences needle haystack
 
                     result =
-                        String.length haystack - (times * (String.length needle))
+                        String.length haystack - (times * String.length needle)
 
                     expected =
                         String.length (replace needle "" haystack)
                 in
-                    Expect.equal expected result
+                Expect.equal expected result
         ]
 
 
@@ -332,12 +332,14 @@ ellipsisTest =
                     result =
                         ellipsis howLong string
                 in
-                    result
-                        |> String.endsWith "..."
-                        |> if String.length string > howLong then
+                result
+                    |> String.endsWith "..."
+                    |> (if String.length string > howLong then
                             Expect.true "Should add ellipsis to this string"
-                           else
+
+                        else
                             Expect.false "Should not add ellipsis"
+                       )
         , fuzz2 (intRange 3 20) string "It starts with the left of the original string" <|
             \howLong string ->
                 let
@@ -347,9 +349,9 @@ ellipsisTest =
                     resultLeft =
                         String.dropRight 3 result
                 in
-                    string
-                        |> String.startsWith resultLeft
-                        |> Expect.true "Should start with the original left"
+                string
+                    |> String.startsWith resultLeft
+                    |> Expect.true "Should start with the original left"
         ]
 
 

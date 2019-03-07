@@ -3,13 +3,11 @@ module CamelizeTest exposing (camelizeTest)
 import Char
 import Expect
 import Fuzz exposing (..)
-import Random.Pcg as Random
 import Regex
-import Shrink
-import String
-import String exposing (uncons, replace)
+import String exposing (replace, uncons)
 import String.Extra exposing (..)
 import Test exposing (..)
+import TestData
 
 
 camelizeTest : Test
@@ -28,14 +26,15 @@ camelizeTest =
         , fuzz string "It is the same lowercased string after removing the dashes and spaces" <|
             \s ->
                 let
-                    expected = replace "-" ""
-                        >> replace "_" ""
-                        >> Regex.replace Regex.All (Regex.regex "\\s+") (\_ -> "")
-                        >> String.toLower
+                    expected =
+                        replace "-" ""
+                            >> replace "_" ""
+                            >> Regex.replace (Regex.fromString "\\s+" |> Maybe.withDefault Regex.never) (\_ -> "")
+                            >> String.toLower
                 in
-                    camelize s
-                        |> String.toLower
-                        |> Expect.equal (expected s)
+                camelize s
+                    |> String.toLower
+                    |> Expect.equal (expected s)
         , fuzz (validWords '-') "The first letter after each dash is capitalized" <|
             \s ->
                 camelize s
@@ -61,24 +60,11 @@ capitalizeOdds : Int -> String -> String
 capitalizeOdds pos str =
     if pos > 0 then
         toSentenceCase str
+
     else
         str
 
 
-latinChars : List (Random.Generator Char)
-latinChars =
-    [ Random.map Char.fromCode (Random.int 97 122), Random.map Char.fromCode (Random.int 65 90) ]
-
-
-withChar : Char -> Random.Generator Char
-withChar ch =
-    Random.choices <| latinChars ++ [ Random.constant ch ]
-
-
 validWords : Char -> Fuzzer String
 validWords ch =
-    let
-        producer =
-            Random.int 1 10 |> Random.andThen (\i -> Random.map String.fromList (Random.list i (withChar ch)))
-    in
-        custom producer Shrink.string
+    TestData.randomStringsWithChars [ ch ]

@@ -15,12 +15,12 @@ unindentTest =
             \s ->
                 let
                     expected =
-                        String.lines >> List.map (String.trimLeft)
+                        String.lines >> List.map String.trimLeft
                 in
-                    unindent s
-                        |> String.lines
-                        |> List.map String.trimLeft
-                        |> Expect.equal (expected s)
+                unindent s
+                    |> String.lines
+                    |> List.map String.trimLeft
+                    |> Expect.equal (expected s)
         , fuzz multilineProducerString "It produces at least one line with no leading whitespace" <|
             \s ->
                 unindent s
@@ -33,13 +33,13 @@ unindentTest =
                 let
                     expected =
                         String.lines s
-                            |> List.map (String.length)
+                            |> List.map String.length
                             |> List.map (\i -> i - spaces)
                 in
-                    unindent s
-                        |> String.lines
-                        |> List.map String.length
-                        |> Expect.equal expected
+                unindent s
+                    |> String.lines
+                    |> List.map String.length
+                    |> Expect.equal expected
         ]
 
 
@@ -51,15 +51,15 @@ multilineProducerString =
 
 multilineProducer : Fuzzer ( String, Int )
 multilineProducer =
-    map (convertToMultiline)
+    map convertToMultiline
         (tuple3 ( intRange 0 10, intRange 0 10, intRange 0 10 ))
 
 
 convertToMultiline : ( Int, Int, Int ) -> ( String, Int )
 convertToMultiline ( a, b, c ) =
-    ( [ (String.repeat a " ") ++ "aaaa aaa "
-      , (String.repeat b " ") ++ "aaaa aaa"
-      , (String.repeat c " ") ++ "ccc  "
+    ( [ String.repeat a " " ++ "aaaa aaa "
+      , String.repeat b " " ++ "aaaa aaa"
+      , String.repeat c " " ++ "ccc  "
       ]
         |> String.join "\n"
     , min (min a b) c

@@ -1,11 +1,11 @@
 module UnicodeTests exposing (unicodeTests)
 
-import String.Extra exposing (..)
-import String
 import Char
-import Test exposing (..)
-import Fuzz exposing (..)
 import Expect
+import Fuzz exposing (..)
+import String
+import String.Extra exposing (..)
+import Test exposing (..)
 
 
 bmpCodePointFuzzer : Fuzzer Int
@@ -38,10 +38,10 @@ unicodeStringFuzzer =
                 , ( 1, surrogatePairFuzzer )
                 ]
     in
-        list sublistFuzzer
-            |> map List.concat
-            |> map (List.map Char.fromCode)
-            |> map String.fromList
+    list sublistFuzzer
+        |> map List.concat
+        |> map (List.map Char.fromCode)
+        |> map String.fromList
 
 
 codePointFuzzer : Fuzzer Int
@@ -50,10 +50,10 @@ codePointFuzzer =
         astralCodePointFuzzer =
             intRange 0x00010000 0x0010FFFF
     in
-        frequency
-            [ ( 1, bmpCodePointFuzzer )
-            , ( 1, astralCodePointFuzzer )
-            ]
+    frequency
+        [ ( 1, bmpCodePointFuzzer )
+        , ( 1, astralCodePointFuzzer )
+        ]
 
 
 expectedStringLength : List Int -> Int
@@ -62,10 +62,11 @@ expectedStringLength codePoints =
         numCodeUnits codePoint =
             if codePoint <= 0xFFFF then
                 1
+
             else
                 2
     in
-        codePoints |> List.map numCodeUnits |> List.sum
+    codePoints |> List.map numCodeUnits |> List.sum
 
 
 hardCodedTestCases : List ( String, List Int )
@@ -104,7 +105,7 @@ unicodeTests =
             (hardCodedTestCases
                 |> List.indexedMap
                     (\index ( string, codePoints ) ->
-                        test ("toCodePoints works properly - test case " ++ toString index)
+                        test ("toCodePoints works properly - test case " ++ Debug.toString index)
                             (\() -> toCodePoints string |> Expect.equal codePoints)
                     )
             )
@@ -112,7 +113,7 @@ unicodeTests =
             (hardCodedTestCases
                 |> List.indexedMap
                     (\index ( string, codePoints ) ->
-                        test ("fromCodePoints works properly - test case " ++ toString index)
+                        test ("fromCodePoints works properly - test case " ++ Debug.toString index)
                             (\() -> fromCodePoints codePoints |> Expect.equal string)
                     )
             )
