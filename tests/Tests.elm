@@ -1,4 +1,23 @@
-module Tests exposing (breakTest, cleanTest, countOccurrencesTest, decapitalizeTest, ellipsisTest, insertAtProducer, insertAtTest, isBlankTest, nonBlankTest, pluralizeTest, softBreakTest, surroundTest, tail, toSentenceCaseTest, toTitleCaseTest, unquoteTest, wrapTest)
+module Tests exposing
+    ( breakTest
+    , cleanTest
+    , countOccurrencesTest
+    , decapitalizeTest
+    , ellipsisTest
+    , insertAtProducer
+    , insertAtTest
+    , isBlankTest
+    , joinMapTest
+    , nonBlankTest
+    , pluralizeTest
+    , softBreakTest
+    , surroundTest
+    , tail
+    , toSentenceCaseTest
+    , toTitleCaseTest
+    , unquoteTest
+    , wrapTest
+    )
 
 import Expect
 import Fuzz exposing (..)
@@ -165,6 +184,20 @@ softBreakTest =
                 softBreak width string
                     |> List.length
                     |> Expect.atMost (String.words string |> List.length)
+        ]
+
+
+joinMapTest : Test
+joinMapTest =
+    describe "joinMap"
+        [ fuzz2 string (list int) "Should yield the same result as List.map combined with String.join" <|
+            \sep list ->
+                Expect.equal
+                    (list
+                        |> List.map String.fromInt
+                        |> String.join sep
+                    )
+                    (joinMap String.fromInt sep list)
         ]
 
 

@@ -3,6 +3,7 @@ module String.Extra exposing
     , camelize, classify, underscored, dasherize, humanize
     , replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
     , break, softBreak
+    , joinMap
     , wrap, wrapWith, softWrap, softWrapWith, quote, surround
     , isBlank, countOccurrences
     , clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags, pluralize
@@ -34,6 +35,11 @@ Functions borrowed from the Rails Inflector class
 ## Splitting
 
 @docs break, softBreak
+
+
+## Joining
+
+@docs joinMap
 
 
 ## Wrapping
@@ -203,6 +209,26 @@ softBreak width string =
 softBreakRegexp : Int -> Regex.Regex
 softBreakRegexp width =
     regexFromString <| ".{1," ++ String.fromInt width ++ "}(\\s+|$)|\\S+?(\\s+|$)"
+
+
+{-| A more performant and easier way of writing
+
+    list
+        |> List.map f
+        |> String.join sep
+
+-}
+joinMap : (a -> String) -> String -> List a -> String
+joinMap f sep list =
+    case list of
+        [ only ] ->
+            f only
+
+        first :: rest ->
+            f first ++ sep ++ joinMap f sep rest
+
+        [] ->
+            ""
 
 
 {-| Trim the whitespace of both sides of the string and compress
