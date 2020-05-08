@@ -233,6 +233,14 @@ isBlank : String -> Bool
 isBlank string =
     Regex.contains (regexFromString "^\\s*$") string
 
+-- Replace string by default if blank
+whenBlank : String -> String -> String
+whenBlank default string =
+    if isBlank string then
+        default
+
+    else
+        string
 
 {-| Convert an underscored or dasherized string to a camelized one.
 
