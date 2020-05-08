@@ -4,7 +4,7 @@ module String.Extra exposing
     , replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
     , break, softBreak
     , wrap, wrapWith, softWrap, softWrapWith, quote, surround
-    , isBlank, countOccurrences
+    , isBlank, whenBlank, countOccurrences
     , clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags, pluralize
     , toSentence, toSentenceOxford
     , rightOf, leftOf, rightOfBack, leftOfBack
