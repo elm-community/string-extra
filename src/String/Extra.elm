@@ -827,6 +827,8 @@ nonEmpty string =
 
     nonBlank "" == Nothing
 
+    nonBlank " " == Nothing
+
     nonBlank "Hello world" == Just "Hello world"
 
 -}
