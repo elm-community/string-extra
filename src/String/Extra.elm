@@ -4,7 +4,7 @@ module String.Extra exposing
     , replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
     , break, softBreak
     , wrap, wrapWith, softWrap, softWrapWith, quote, surround
-    , isBlank, countOccurrences
+    , isBlank, whenBlank, countOccurrences
     , clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags, pluralize
     , toSentence, toSentenceOxford
     , rightOf, leftOf, rightOfBack, leftOfBack
@@ -233,6 +233,14 @@ isBlank : String -> Bool
 isBlank string =
     Regex.contains (regexFromString "^\\s*$") string
 
+-- Replace string by default if blank
+whenBlank : String -> String -> String
+whenBlank default string =
+    if isBlank string then
+        default
+
+    else
+        string
 
 {-| Convert an underscored or dasherized string to a camelized one.
 
