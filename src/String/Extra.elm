@@ -2,7 +2,7 @@ module String.Extra exposing
     ( toSentenceCase, toTitleCase, decapitalize
     , camelize, classify, underscored, dasherize, humanize
     , replaceSlice, insertAt, nonEmpty, nonBlank, removeAccents
-    , break, softBreak
+    , break, softBreak, words
     , wrap, wrapWith, softWrap, softWrapWith, quote, surround
     , isBlank, countOccurrences
     , clean, unquote, unsurround, unindent, ellipsis, softEllipsis, ellipsisWith, stripTags, pluralize
@@ -33,7 +33,7 @@ Functions borrowed from the Rails Inflector class
 
 ## Splitting
 
-@docs break, softBreak
+@docs break, softBreak, words
 
 
 ## Wrapping
@@ -897,3 +897,23 @@ regexEscape =
 regexFromString : String -> Regex
 regexFromString =
     Regex.fromString >> Maybe.withDefault Regex.never
+
+
+{-| Adapt the standard library implementation to behave "better" on blank text.
+It follows the definition that the empty string is never a word,
+so there are 0 words in blank text.
+
+    words "" == []
+
+    words "  \t\n  \r\n\n\u00a0   " == []
+
+Aside for blank text (as judged by `isBlank`, `String.Extra.words` behaves like `String.words`.
+
+-}
+words : String -> List String
+words text =
+    if isBlank text then
+        []
+
+    else
+        String.words text
