@@ -337,7 +337,7 @@ underscored string =
     string
         |> String.trim
         |> Regex.replace (regexFromString "([a-z\\d])([A-Z]+)") (.submatches >> List.filterMap identity >> String.join "_")
-        |> Regex.replace (regexFromString "[_-\\s]+") (always "_")
+        |> Regex.replace (regexFromString "[_\\s-]+") (always "_")
         |> String.toLower
 
 
@@ -355,7 +355,7 @@ dasherize string =
     string
         |> String.trim
         |> Regex.replace (regexFromString "([A-Z])") (.match >> String.append "-")
-        |> Regex.replace (regexFromString "[_-\\s]+") (always "-")
+        |> Regex.replace (regexFromString "[_\\s-]+") (always "-")
         |> String.toLower
 
 
