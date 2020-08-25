@@ -118,15 +118,8 @@ decapitalize word =
 
 -}
 toTitleCase : String -> String
-toTitleCase ws =
-    let
-        uppercaseMatch =
-            Regex.replace (regexFromString "\\w+") (.match >> toSentenceCase)
-    in
-    ws
-        |> Regex.replace
-            (regexFromString "^([a-z])|\\s+([a-z])")
-            (.match >> uppercaseMatch)
+toTitleCase phrase =
+    phrase |> String.split " " |> List.map String.toSentenceCase |> String.join " "
 
 
 {-| Replace text within a portion of a string given a substitution
