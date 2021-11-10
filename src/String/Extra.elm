@@ -741,12 +741,17 @@ consisting of the characters in the string that are to the right of the pattern.
 -}
 rightOfBack : String -> String -> String
 rightOfBack pattern string =
-    string
-        |> String.indexes pattern
-        |> List.reverse
-        |> List.head
-        |> Maybe.map ((+) (String.length pattern) >> (\a -> String.dropLeft a string))
-        |> Maybe.withDefault ""
+    case String.indexes pattern string of
+        [] ->
+            ""
+
+        firstIndex :: rest ->
+            case last rest of
+                Just lastIndex ->
+                    String.slice (String.length pattern + lastIndex) (String.length string) string
+
+                Nothing ->
+                    String.slice (String.length pattern + firstIndex) (String.length string) string
 
 
 {-| Search a string from right to left for a pattern and return a substring
@@ -757,12 +762,30 @@ consisting of the characters in the string that are to the left of the pattern.
 -}
 leftOfBack : String -> String -> String
 leftOfBack pattern string =
-    string
-        |> String.indexes pattern
-        |> List.reverse
-        |> List.head
-        |> Maybe.map (\a -> String.left a string)
-        |> Maybe.withDefault ""
+    case String.indexes pattern string of
+        [] ->
+            ""
+
+        firstIndex :: rest ->
+            case last rest of
+                Just lastIndex ->
+                    String.slice 0 lastIndex string
+
+                Nothing ->
+                    String.slice 0 firstIndex string
+
+
+last : List a -> Maybe a
+last items =
+    case items of
+        [] ->
+            Nothing
+
+        [ x ] ->
+            Just x
+
+        _ :: rest ->
+            last rest
 
 
 {-| Convert a string into a list of UTF-32 code points.
