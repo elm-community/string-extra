@@ -353,10 +353,8 @@ The final string will be lowercased.
 dasherize : String -> String
 dasherize string =
     string
-        |> String.trim
-        |> Regex.replace (regexFromString "([A-Z])") (.match >> String.append "-")
-        |> Regex.replace (regexFromString "[_-\\s]+") (always "-")
-        |> String.toLower
+        |> underscored
+        |> String.replace "_" "-"
 
 
 {-| Separate a string into parts of a given width, using a given separator.
